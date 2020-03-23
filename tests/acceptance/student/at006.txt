@@ -1,0 +1,12 @@
+--play
+test(3,5,7,15,30)
+pass
+wormhole
+move(SE)
+move(E)
+wormhole
+status
+move(NW)
+move(NW)
+land
+liftoff

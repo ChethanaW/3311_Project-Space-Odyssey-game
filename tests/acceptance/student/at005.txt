@@ -1,0 +1,13 @@
+play
+move(E)
+move(E)
+status
+land
+move(SW)
+move(SW)
+status
+land
+pass
+pass
+liftoff
+wormhole

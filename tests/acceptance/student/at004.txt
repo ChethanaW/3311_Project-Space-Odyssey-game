@@ -1,0 +1,14 @@
+play
+abort
+test(3,5,7,15,30)
+play
+abort
+play
+test(3,5,7,15,30)
+abort
+test(3,5,7,15,30)
+test(1,4,8,13,40)
+play
+test(6,9,18,29,51)
+play
+abort
