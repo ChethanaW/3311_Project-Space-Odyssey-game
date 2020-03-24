@@ -188,7 +188,7 @@ feature -- model operations
 			cmd_name:="move"
 			error:= FALSE
 
-			if mode ~ "abort" or mode ~ "start" then
+			if mode ~ "abort" or mode ~ "start" or fuel_check_game_over then
 				error:= TRUE
 				error_message:= info.get_error_messages (1)
 			else
@@ -205,7 +205,7 @@ feature -- model operations
 				g.move_planets
 	 			board_print := g.out
 	 			-- print(explorer.fuel)
-	 			if g.fuel_check then -- out of fuel
+	 			if info.explorer.fuel < 1 then -- out of fuel
 	 				fuel_check_game_over := true
 	 			end
 			end
@@ -424,18 +424,52 @@ feature -- queries
 					Result.append ("%N")
 					Result.append ("  ")
 
+					if fuel_check_game_over then
+						Result.append("Explorer got lost in space - out of fuel at Sector:")
+						Result.append_integer_64(info.explorer.exp_coordinates.row)
+						Result.append(":")
+						Result.append_integer_64(info.explorer.exp_coordinates.column)
+						Result.append("%N")
+						Result.append("  The game has ended. You can start a new game.")
+						Result.append("%N  ")
+
+					end
+
 
 					if cmd_name ~ "abort" or cmd_name ~ "status" then
 						if cmd_name ~ "abort" then
 							Result.append ("Mission aborted. Try test(3,5,7,15,30)")
 						elseif cmd_name ~ "status" then
-							-- if explorer not landed
-								--Result.append ("Explorer status report:Travelling at cruise speed at [") + X + Result.append(",") +Y + Result.append(",") + Z +Result.append("]")
-								--Result.append ("Life units left:" + V + Result.append(", Fuel units left:") + W
+							if not info.explorer.landed then
+								Result.append ("Explorer status report:Travelling at cruise speed at [")
+								Result.append_integer_64(info.explorer.exp_coordinates.row)
+								Result.append(",")
+								Result.append_integer_64(info.explorer.exp_coordinates.column)
+								Result.append(",")
+								Result.append_integer_64(info.explorer.quadrant)
+								Result.append("]")
+								Result.append("%N")
+								Result.append ("  Life units left:")
+								Result.append_integer_64(info.explorer.life)
+								Result.append(", Fuel units left:")
+								Result.append_integer_64(info.explorer.fuel)
 
-							--if explorer landed
-								--Result.append ("Explorer status report:Stationary on planet surface at [") + X + Result.append(",") +Y + Result.append(",") + Z +Result.append("]")
-								--Result.append ("Life units left:" + V + Result.append(", Fuel units left:") + W
+							elseif info.explorer.landed then
+
+								Result.append ("Explorer status report:Stationary on planet surface at [")
+								Result.append_integer_64(info.explorer.exp_coordinates.row)
+								Result.append(",")
+								Result.append_integer_64(info.explorer.exp_coordinates.column)
+								Result.append(",")
+								Result.append_integer_64(info.explorer.quadrant)
+								Result.append("]")
+							--	Result.append ("Life units left:" + V + Result.append(", Fuel units left:") + W
+								Result.append("%N")
+								Result.append("  Life units left:")
+								Result.append_integer_64(info.explorer.life)
+								REsult.append(", Fuel units left:")
+								Result.append_integer_64(info.explorer.fuel)
+							end
 						end
 
 					else

@@ -287,7 +287,7 @@ feature --commands
 							end
 						quadrant := quadrant +1
 					end
-				get_updated_fuel(shared_info.explorer, shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column) -- print(ex.fuel)
+				get_updated_fuel(shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column) -- print(ex.fuel)
 				-- shared_info.explorer.update_coord(ex.exp_coordinates.row, ex.exp_coordinates.column)
 				if shared_info.explorer.fuel < 1 then
 					grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.go_i_th (pointer)
@@ -555,21 +555,21 @@ feature -- query
 			Result := FALSE
 		end
 
-	get_updated_fuel(e: EXPLORER; row: INTEGER; col: INTEGER)
+	get_updated_fuel(row: INTEGER; col: INTEGER)
 		do
-			e.update_fuel(e.fuel - 1)
+			shared_info.explorer.update_fuel(shared_info.explorer.fuel - 1)
 			across grid[row, col].contents is entity loop
 				if entity ~ create{ENTITY_ALPHABET}.make('*') then
-					e.update_fuel(3)
+					shared_info.explorer.update_fuel(3)
 					-- print("herererer")
 				elseif entity ~ create{ENTITY_ALPHABET}.make('Y') then
-					e.update_fuel(3)
+					shared_info.explorer.update_fuel(3)
 				end
-				if e.fuel > 3 then
-					e.update_fuel(3)
+				if shared_info.explorer.fuel > 3 then
+					shared_info.explorer.update_fuel(3)
 				end
 			end
-			if e.fuel < 1 then
+			if shared_info.explorer.fuel < 1 then
 				fuel_check := true
 			end
 		end
