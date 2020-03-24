@@ -22,7 +22,7 @@ feature{NONE}
 			planet_id := 1
 
 			create explorer.make
-
+			skip_explorer_coordinates := false
 			stationary_id:=1
 
 		end
@@ -84,6 +84,8 @@ feature
 
 	explorer: EXPLORER
 
+	skip_explorer_coordinates: BOOLEAN
+
 
 feature --commands
 	test(a_threshold: INTEGER; j_threshold: INTEGER; m_threshold: INTEGER; b_threshold: INTEGER; p_threshold: INTEGER)
@@ -98,6 +100,11 @@ feature --commands
 				set_janitaur_threshold (j_threshold)
 				set_malevolent_threshold (m_threshold)
 				set_planet_threshold (p_threshold)
+		end
+
+	set_skip_explorer_coordinates(b: BOOLEAN)
+		do
+			skip_explorer_coordinates := b
 		end
 
 	set_malevolent_threshold(threshhold:INTEGER)
@@ -158,6 +165,8 @@ feature --queries
 				Result := "Thresholds should be non-decreasing order."
 			when 11 then  -- used by wormhole
 				Result := "Explorer couldn't find wormhole at Sector:"  -- need to append X:Y to the end
+			when 12 then -- devoured by black hole then
+				Result := "Explorer got devoured by blackhole (id: -1) at Sector:3:3"
 			else
 				Result := "error with no description- something went wrong "
 			end

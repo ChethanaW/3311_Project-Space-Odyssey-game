@@ -47,7 +47,7 @@ feature {NONE} -- Initialization
 			create error_message.make_empty
 
 			--other
-         	create explorer.make
+         --	create explorer.make
          	create planet.make
          	create g.dummy_galaxy_make
          	info := sa.shared_info
@@ -82,7 +82,7 @@ feature -- model attributes
     --other
 	g : GALAXY -- has access to shared information
  	info : SHARED_INFORMATION
-	explorer : EXPLORER
+	-- explorer : EXPLORER
     planet: PLANET
 
 
@@ -145,7 +145,7 @@ feature -- model operations
 					land_flag := 1
 				end
 			--	g.ex.update_landed_status(TRUE)
-
+				info.set_skip_explorer_coordinates(TRUE)
 				info.explorer.update_landed_status (true)  -------###### double check if this is correct the case if no life we still land or not
 				g.move_planets
 			end
@@ -157,7 +157,7 @@ feature -- model operations
 	liftoff
 			-- Lifts the explorer off a planet.
 		do
-			cmd_name:="liftoff"
+		--	cmd_name:="liftoff"
 			error:= FALSE
 
 			if mode ~ "abort" or mode ~ "start" then
@@ -165,7 +165,18 @@ feature -- model operations
 				error_message:= info.get_error_messages (1)
 			else
 				-- things to do if liftoff is used at a valid time
-				entity_movement:= TRUE -- bcs planets and others move without the explorer
+				if info.explorer.landed then -- if landed last move, then liftoff is valid
+					cmd_name := "liftoff"
+					info.set_skip_explorer_coordinates(TRUE)
+					entity_movement:=TRUE
+					g.move_planets
+					info.explorer.update_landed_status (false) -- lifting off, not landed anymore
+				else
+					error:=TRUE
+					error_message:=info.get_error_messages(6)
+				end
+				--entity_movement:= TRUE -- bcs planets and others move without the explorer
+				--g.move_planets
 			end
 
 			update_status
@@ -183,10 +194,13 @@ feature -- model operations
 			else
 				-- things to do if move is used at a valid time
 				entity_movement:= TRUE -- bcs almost all movables move
-				exp_move_status:= explorer.move_expl (a_dir, g)
+				exp_move_status:= info.explorer.move_expl (a_dir, g)
 				if exp_move_status ~ FALSE then
 					error:= TRUE
 					error_message:= info.get_error_messages (8)
+				elseif info.explorer.is_dead ~ TRUE then
+					error:=TRUE
+					error_message:= info.get_error_messages (12)
 				end
 				g.move_planets
 	 			board_print := g.out
@@ -211,7 +225,9 @@ feature -- model operations
 				error_message:= info.get_error_messages (1)
 			else
 				-- things to do if pass is used at a valid time
+				info.set_skip_explorer_coordinates(TRUE)
 				entity_movement:= TRUE -- bcs planets and others move without the explorer
+				g.move_planets
 			end
 
 			update_status
@@ -236,6 +252,7 @@ feature -- model operations
          		create g.make
 
 				board_print := g.out
+
 			else
 				error:= TRUE
 				error_message:= info.get_error_messages (9)
@@ -292,22 +309,37 @@ feature -- model operations
 
 	wormhole
 			-- Tunnels the explorer to a random sector (first open quadrant).
+		local
+			entity: ENTITY_ALPHABET
 		do
+			create entity.make('E')
 			cmd_name:="wormhole"
 			error:= FALSE
 
 			if mode ~ "abort" or mode ~ "start" then
 				error:= TRUE
 				error_message:= info.get_error_messages (1)
+			elseif info.explorer.landed ~ TRUE then
+				error:= TRUE
+				error_message:= info.get_error_messages(7)
 			else
+				exp_move_status:= g.check_for_wormhole
+				--g.wormhole_move(entity)
+				if exp_move_status ~ FALSE then
+					error:=TRUE
+					error_message:= info.get_error_messages(11)
+				else
+
 				-- things to do if wormhole is used at a valid time
 				--if wormhole present
 					cmd_name := "move" -- due to similar functionality same """update_status"""
 				--  explore randomly moves
+				g.wormhole_move(entity)
 				--  planet moves just as if move command was entered
+				g.move_planets
+				end
 
-				--else
-				--  name doesnt change
+
 			end
 
 			update_status
@@ -372,6 +404,11 @@ feature -- queries
 						Result.append ("%N")
 						Result.append ("  ")
 						Result.append (error_message)
+						if cmd_name ~ "wormhole" then
+							Result.append_integer_64(info.explorer.exp_coordinates.row)
+							Result.append(":")
+							Result.append_integer_64(info.explorer.exp_coordinates.column)
+						end
 					else
 						Result.append (", error")
 						Result.append ("%N")
@@ -404,9 +441,13 @@ feature -- queries
 					else
 						if cmd_name ~ "liftoff" then
 							Result.append ("Explorer has lifted off from planet at Sector:")
+							Result.append_integer_64(info.explorer.exp_coordinates.row)
+							Result.append(":")
+							Result.append_integer_64(info.explorer.exp_coordinates.column)
 							-- add the X:Y
 							Result.append ("%N")
 							Result.append ("  ")
+
 
 						elseif cmd_name ~ "land" then
 							if land_flag ~ 1 then--if life was found on the planet
@@ -434,7 +475,7 @@ feature -- queries
 							Result.append (g.description_out)
 							Result.append ("%N")
 							Result.append ("  Deaths This Turn:")
-							Result.append (g.ex.death_message)
+							Result.append (info.explorer.death_message)
 						end
 
 						Result.append(g.out)
