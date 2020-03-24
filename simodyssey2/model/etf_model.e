@@ -138,15 +138,31 @@ feature -- model operations
 			if mode ~ "abort" or mode ~ "start" then
 				error:= TRUE
 				error_message:= info.get_error_messages (1)
+			elseif info.explorer.landed ~ true then
+				error:= TRUE
+				error_message:= info.get_error_messages (2)
+			elseif not info.explorer.has_yellow_dwarf then
+				error:= TRUE
+				error_message:= info.get_error_messages(3)
+			elseif not info.explorer.has_planets then
+				error:= TRUE
+				error_message:= info.get_error_messages(4)
+			elseif g.all_planets_visited then
+				error:= TRUE
+				error_message:= info.get_error_messages(5)
 			else
 				-- things to do if land is used at a valid time
-				trying_to_land := 1
-				if g.landed_planet = true then
+				-- trying_to_land := 1
+				--if g.landed_planet = true then
+				if info.planet_supports_life then
 					land_flag := 1
 				end
+
+				--end
+				g.visit_planet
 			--	g.ex.update_landed_status(TRUE)
 				info.set_skip_explorer_coordinates(TRUE)
-				info.explorer.update_landed_status (true)  -------###### double check if this is correct the case if no life we still land or not
+				info.explorer.update_landed_status (TRUE)  -------###### double check if this is correct the case if no life we still land or not
 				g.move_planets
 			end
 
@@ -157,7 +173,7 @@ feature -- model operations
 	liftoff
 			-- Lifts the explorer off a planet.
 		do
-		--	cmd_name:="liftoff"
+			cmd_name:="liftoff"
 			error:= FALSE
 
 			if mode ~ "abort" or mode ~ "start" then
@@ -173,6 +189,7 @@ feature -- model operations
 					info.explorer.update_landed_status (false) -- lifting off, not landed anymore
 				else
 					error:=TRUE
+					cmd_name:="wormhole" -- display purposes
 					error_message:=info.get_error_messages(6)
 				end
 				--entity_movement:= TRUE -- bcs planets and others move without the explorer
@@ -191,6 +208,10 @@ feature -- model operations
 			if mode ~ "abort" or mode ~ "start" or fuel_check_game_over then
 				error:= TRUE
 				error_message:= info.get_error_messages (1)
+			elseif info.explorer.landed then
+				error:= TRUE
+				cmd_name:= "wormhole" -- for display purposes
+				error_message:= info.get_error_messages (7)
 			else
 				-- things to do if move is used at a valid time
 				entity_movement:= TRUE -- bcs almost all movables move
@@ -198,9 +219,10 @@ feature -- model operations
 				if exp_move_status ~ FALSE then
 					error:= TRUE
 					error_message:= info.get_error_messages (8)
-				elseif info.explorer.is_dead ~ TRUE then
-					error:=TRUE
-					error_message:= info.get_error_messages (12)
+				elseif info.explorer.is_dead then
+					fuel_check_game_over := true -- for display purposes... need to see the grid and error message
+					-- error:=TRUE
+					-- error_message:= info.get_error_messages (12)
 				end
 				g.move_planets
 	 			board_print := g.out
@@ -209,9 +231,7 @@ feature -- model operations
 	 				fuel_check_game_over := true
 	 			end
 			end
-
  			update_status
-
 		end
 
 	pass
@@ -242,6 +262,9 @@ feature -- model operations
 			movement_out := FALSE
 	 		entity_movement:= FALSE -- nothing moves
 			play_check:= play_check + 1
+			info.explorer.update_fuel(3)
+			info.explorer.update_coord (1, 1)
+			info.explorer.set_quadrant (1) -- verify
 
 
 			if mode ~"abort" or mode ~ "start" then
@@ -404,7 +427,7 @@ feature -- queries
 						Result.append ("%N")
 						Result.append ("  ")
 						Result.append (error_message)
-						if cmd_name ~ "wormhole" then
+						if cmd_name ~ "wormhole" or cmd_name ~ "land" then
 							Result.append_integer_64(info.explorer.exp_coordinates.row)
 							Result.append(":")
 							Result.append_integer_64(info.explorer.exp_coordinates.column)
@@ -425,12 +448,16 @@ feature -- queries
 					Result.append ("  ")
 
 					if fuel_check_game_over then
+						if info.explorer.is_dead then
+							Result.append("Explorer got devoured by blackhole (id: -1) at Sector:3:3")
+						else
 						Result.append("Explorer got lost in space - out of fuel at Sector:")
 						Result.append_integer_64(info.explorer.exp_coordinates.row)
 						Result.append(":")
 						Result.append_integer_64(info.explorer.exp_coordinates.column)
 						Result.append("%N")
 						Result.append("  The game has ended. You can start a new game.")
+						end
 						Result.append("%N  ")
 
 					end

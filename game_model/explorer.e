@@ -27,10 +27,14 @@ feature {NONE} -- Initialization
 			create death_message.make_empty
 			death_message := "none"
 			is_dead:= false
+			has_yellow_dwarf:= false
+			has_planets:= false
 		end
 feature -- model attributes
 
 	is_dead: BOOLEAN
+
+	has_yellow_dwarf: BOOLEAN
 
     letter : ENTITY_ALPHABET
 
@@ -56,6 +60,8 @@ feature -- model attributes
     sector_out_info: STRING
 
     death_message: STRING
+
+    has_planets: BOOLEAN
 
 feature -- Command
 
@@ -97,7 +103,7 @@ feature -- Command
 --					IO.putint (direction.last)
 
  					move_status := g.move_player (direction.first, direction.last, letter)
- 					
+
  					Result := move_status
 				end
 
@@ -105,6 +111,16 @@ feature -- Command
 				do
 					is_dead:= status
 				end
+
+		set_yellow_dwarf(status: BOOLEAN)
+			do
+				has_yellow_dwarf:= status
+			end
+
+		set_has_planets(status: BOOLEAN) -- there are planets at the sector
+			do
+				has_planets:= status
+			end
 
 --	update_fuel(sect: SECTOR)
 --		local

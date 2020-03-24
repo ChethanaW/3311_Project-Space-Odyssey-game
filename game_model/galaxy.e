@@ -280,10 +280,18 @@ feature --commands
 --						end
 					end
 					quadrant := 1
+					shared_info.explorer.set_yellow_dwarf(false)
+					shared_info.explorer.set_yellow_dwarf(false)
 					across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity
 						loop
 							if entity ~ create{ENTITY_ALPHABET}.make('E') then
 								shared_info.explorer.set_quadrant (quadrant)
+							end
+							if entity ~ create{ENTITY_ALPHABET}.make('Y') then
+								shared_info.explorer.set_yellow_dwarf(true)
+							end
+							if entity ~ create{ENTITY_ALPHABET}.make('P') then
+								shared_info.explorer.set_has_planets(true)
 							end
 						quadrant := quadrant +1
 					end
@@ -540,19 +548,62 @@ feature --commands
 		grid[last_coord.exp_coordinates.row,last_coord.exp_coordinates.column].contents.prune_all (a_ent)
 	end
 
+	visit_planet
+		local
+			flagcheck: BOOLEAN
+		do
+			flagcheck:= FALSE
+			shared_info.set_planet_supports_life(false)
+			across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity loop
+				if not flagcheck then
+				if entity ~ create{ENTITY_ALPHABET}.make('P') then
+					across shared_info.planet_list is planet loop
+						if entity.entity_planet_id ~ planet.planet_id and not planet.visited then -- make sure this works
+							planet.set_visited(TRUE)
+							if planet.supports_life then
+								shared_info.set_planet_supports_life(true)
+							end
+							flagcheck:= TRUE
+						end
+
+					end
+				end
+				end
+			end
+		end
+
+
 
 
 feature -- query
 
+	all_planets_visited: BOOLEAN
+		do
+			Result:= TRUE
+			across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity loop
+				if entity ~ create{ENTITY_ALPHABET}.make('P') then
+					across shared_info.planet_list is planet loop
+						if entity.entity_planet_id ~ planet.planet_id then
+							if not planet.visited then
+								Result:= FALSE
+							end
+						end
+
+					end
+				end
+			end
+		end
+
 	check_for_wormhole: BOOLEAN
 		do
 			--create worm.make('W')
+			Result:= FALSE
 			across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity loop
 				if entity ~ create{ENTITY_ALPHABET}.make('W') then
 					Result := TRUE
 				end
 			end
-			Result := FALSE
+			-- Result := FALSE
 		end
 
 	get_updated_fuel(row: INTEGER; col: INTEGER)
@@ -609,22 +660,22 @@ feature -- query
 		end
 
 
-	landed_planet: BOOLEAN
-		require
-			-- MUST BE AT YELLOW STAR
-		do
-			Result := false
-			across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity loop
-				if entity ~ letter_p then
-					across shared_info.planet_list is planet loop
-						if entity.entity_planet_id ~ planet.planet_id and planet.supports_life = true then
-							Result := true
-						end
-					end
-				end
-			end
+--	landed_planet: BOOLEAN
+--		require
+--			-- MUST BE AT YELLOW STAR
+--		do
+--			Result := false
+--			across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity loop
+--				if entity ~ letter_p then
+--					across shared_info.planet_list is planet loop
+--						if entity.entity_planet_id ~ planet.planet_id and planet.supports_life = true then
+--							Result := true
+--						end
+--					end
+--				end
+--			end
 
-		end
+--		end
 
 	out_movement:STRING
 	 	local

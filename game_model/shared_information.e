@@ -22,8 +22,9 @@ feature{NONE}
 			planet_id := 1
 
 			create explorer.make
-			skip_explorer_coordinates := false
+			skip_explorer_coordinates := FALSE
 			stationary_id:=1
+			planet_supports_life:= FALSE
 
 		end
 
@@ -86,6 +87,8 @@ feature
 
 	skip_explorer_coordinates: BOOLEAN
 
+	planet_supports_life: BOOLEAN
+
 
 feature --commands
 	test(a_threshold: INTEGER; j_threshold: INTEGER; m_threshold: INTEGER; b_threshold: INTEGER; p_threshold: INTEGER)
@@ -100,6 +103,11 @@ feature --commands
 				set_janitaur_threshold (j_threshold)
 				set_malevolent_threshold (m_threshold)
 				set_planet_threshold (p_threshold)
+		end
+
+	set_planet_supports_life(status: BOOLEAN)
+		do
+			planet_supports_life:= status
 		end
 
 	set_skip_explorer_coordinates(b: BOOLEAN)

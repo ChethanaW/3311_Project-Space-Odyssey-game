@@ -19,7 +19,7 @@ feature {NONE} -- Initialization
 			yellow_dwarf := false
 			has_checked_for_life := false
 			create entity_alphabet.make('P')
-			landed := false
+			visited := false
 			create sector_out_info.make_empty
 
 		end
@@ -57,7 +57,7 @@ feature -- model attributes
 
 	entity_alphabet: ENTITY_ALPHABET
 
-	landed: BOOLEAN
+	-- landed: BOOLEAN
 
 	new_quadrant: INTEGER
 
@@ -144,7 +144,10 @@ feature --commands
 			star_val := val
 		end
 
-
+	set_visited(status: BOOLEAN)
+		do
+			visited:= status
+		end
 
 
 feature -- query
@@ -186,11 +189,9 @@ feature -- query
 		end
 
 
-	is_landed(b: BOOLEAN) : BOOLEAN
+	is_visited : BOOLEAN
 		do
-			landed := b
-			visited := b
-			Result := landed
+			Result := visited
 		end
 
 	get_description: STRING
