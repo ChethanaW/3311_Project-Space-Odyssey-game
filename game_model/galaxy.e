@@ -52,6 +52,13 @@ feature -- attributes
 	stat_id: INTEGER
 
 
+	-- for movables  %%%%%%%%%%%%%%%%%%%%%%%%%
+	letter_for_movable : ENTITY_ALPHABET
+	move_movable_list : ARRAY[MOVABLE]
+	movables_move_index: INTEGER
+
+
+
 feature --constructor
 
 	make
@@ -97,6 +104,12 @@ feature --constructor
 			p_move_index :=0
 			fuel_check := false
 
+			-- for movables
+			create letter_for_movable.make('B')
+			create move_movable_list.make_empty
+			movables_move_index :=0
+
+
 	end
 
 feature -- constructor
@@ -114,6 +127,9 @@ feature -- constructor
 			last_coord := ex.deep_twin
 			create letter_replacement.make('-')
 			create move_planet_list.make_empty
+
+			create letter_for_movable.make('B')
+			create move_movable_list.make_empty
 
 		end
 
@@ -457,13 +473,74 @@ feature --commands
 
 			end
 
-		end
+		end --move planets
 
+	move_movables  --planet, benign, malevolent,janitaur, asteroid (5)
+		local
+			row_counter: INTEGER
+			col_counter: INTEGER
+			sector_counter: INTEGER
+			turn :INTEGER
+			movables: MOVABLE
+			temp: ARRAY[MOVABLE]
+			yellow_dwarf: INTEGER -- I think this need to change INTEGER into YELLOW_DWARF %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+			num: INTEGER
+			new_q: INTEGER
 
-	check_planet(p: PLANET)
 		do
+			create temp.make_empty
+			temp.compare_objects
+			yellow_dwarf := 0
+
+			across shared_info.movables_list is movable_objects loop
+--				if movable_objects.get_turn = 0 then
+--				across grid[planet.get_row, planet.get_col].contents is val loop
+--					if val.is_star then
+--						planet.star_value(True)
+--						if val.item ~ 'Y' then
+--							planet.has_yellow_dwarf(true)
+--						else
+--							planet.has_yellow_dwarf(false)
+--						end
+--					end
+--				end
+--				end
+
+
+				if planet.get_turn = 0 then
+					if planet.has_star = true then
+						if planet.yellow_dwarf = true and not planet.has_checked_for_life then
+							num := gen.rchoose(1, 2) -- num=2 means life
+							if num = 2 then
+								planet.support_life(true)
+							end
+							planet.set_check_flag(TRUE)
+						end
+					else
+						movement(planet)
+						get_planet_new_quadrant(planet, planet.r, planet.c)
+
+						if planet.has_star = false then
+							turn:=gen.rchoose (0, 2)
+						end
+						planet.set_turn(turn)
+					end
+				else
+					planet.set_turn(planet.get_turn - 1)
+				end
+
+--				print("before decrementing turn ")
+--				print(planet.get_turn)
+--				print(" ")
+--				print("%N")
+
+			end
 
 		end
+
+
+
+
 
 
 

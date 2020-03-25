@@ -77,6 +77,7 @@ feature -- commands
 			component: ENTITY_ALPHABET
 			turn :INTEGER
 			p : PLANET
+			movables : MOVABLE --changes did %%%%%%%%%%%%%%%%%%%%%%%%%
 			i : INTEGER
 
 		do
@@ -105,19 +106,8 @@ feature -- commands
 								if threshold < shared_info.planet_threshold then
 									create component.make('P')
 									create p.make
-									p.set_row (row)
-									p.set_column (column)
-									p.set_quadrant (i)
-									p.set_planet_id (shared_info.planet_id)
-									p.set_entity_alphabet(component)
+									movables := p -- changes did  %%%%%%%%%%%%%%%%%%%%%%%%%
 
-									component.represents_planet_id (p.planet_id)
-									shared_info.planet_entity_list.force(component, shared_info.planet_entity_list.count + 1)
-
-									shared_info.shared_set_planet_id(shared_info.planet_id + 1) -- increment planet_id value for the next planet object generated
-
-
-									shared_info.planet_list.force (p, shared_info.planet_list.count + 1)
 									--turn:=gen.rchoose (0, 2)
 									--p.set_turn (turn)
 								end
@@ -125,6 +115,20 @@ feature -- commands
 						end
 					end
 				end
+
+				movables.set_row (row) -- changes did  %%%%%%%%%%%%%%%%%%%%%%%%%
+				movables.set_column (column) -- changes did  %%%%%%%%%%%%%%%%%%%%%%%%%
+				movables.set_quadrant (i)
+				movables.set_id (shared_info.movables_id)
+				movables.set_entity_alphabet(component)
+
+				component.represents_movable_id (movables.movable_id)
+				shared_info.movables_entity_list.force(component, shared_info.movables_entity_list.count + 1)
+
+				shared_info.shared_set_movables_id(shared_info.movables_id + 1) -- increment planet_id value for the next planet object generated
+
+
+				shared_info.movables_list.force (movables, shared_info.movables_list.count + 1)
 
 				if attached component as entity then
 					put (entity) -- add new entity to the contents list

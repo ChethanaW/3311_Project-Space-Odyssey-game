@@ -43,6 +43,14 @@ feature -- Attributes
 
     --planet: PLANET
 
+    -- for movables
+    entity_movable_id: INTEGER
+    entity_benign_id: INTEGER
+    entity_malevolent_id: INTEGER
+    entity_janitaur_id: INTEGER
+    entity_asteroid_id: INTEGER
+
+
 
 feature -- Query
 
@@ -107,6 +115,38 @@ feature -- Query
 
     	end
 
+    represents_movable_id(move_id: INTEGER)
+    	do
+    		entity_movable_id := move_id
+
+    	end
+
+    represents_benign_id(benign_id: INTEGER)
+    	do
+    		entity_benign_id := benign_id
+
+    	end
+
+    represents_malevolent_id(malevolent_id: INTEGER)
+    	do
+    		entity_malevolent_id := malevolent_id
+
+    	end
+
+    represents_janitaur_id(janitaur_id: INTEGER)
+    	do
+    		entity_janitaur_id := janitaur_id
+
+    	end
+
+    represents_asteroid_id(asteroid_id: INTEGER)
+    	do
+    		entity_asteroid_id := asteroid_id
+
+    	end
+
+
+
 --    get_planet_associated: PLANET
 --    	do
 --    		Result := planet
@@ -117,5 +157,5 @@ feature -- Query
 invariant
     allowable_symbols:
     	item = 'E' or item = 'P' or item = 'A' or item = 'M' or  item = 'J' or item = 'O' or item = 'W' or item = 'Y' or item = '*' or item='B'  or item = '-'
-   
+
 end

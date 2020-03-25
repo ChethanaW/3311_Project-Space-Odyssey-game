@@ -7,6 +7,11 @@ note
 class
 	PLANET
 
+	inherit
+		MOVABLE
+
+
+
 create
 	make
 
@@ -21,60 +26,27 @@ feature {NONE} -- Initialization
 			create entity_alphabet.make('P')
 			landed := false
 			create sector_out_info.make_empty
+			create death_message.make_empty
 
 		end
 feature -- model attributes
 
-    letter : ENTITY_ALPHABET
-
-    r: INTEGER
-
-    c: INTEGER
-
-    t : INTEGER
-
-    quadrant: INTEGER
-
-    prev_r: INTEGER
-
-    prev_c: INTEGER
-
-    prev_quadrant: INTEGER
-
-	star_val : BOOLEAN
-
-	supports_life : BOOLEAN
 
 	yellow_dwarf : BOOLEAN
 
-	has_checked_for_life : BOOLEAN
-
-	visited: BOOLEAN
-
-	attached_check: BOOLEAN
-
-	planet_id : INTEGER
-
-	entity_alphabet: ENTITY_ALPHABET
-
-	landed: BOOLEAN
-
-	new_quadrant: INTEGER
-
-	sector_out_info: STRING
 
 feature --commands
 
-	set_entity_alphabet(l: ENTITY_ALPHABET)
-		do
-			entity_alphabet := l
-		end
+--	set_entity_alphabet(l: ENTITY_ALPHABET)
+--		do
+--			entity_alphabet := l
+--		end
 
 
-	set_planet_id(id: INTEGER)
-		do
-			planet_id := id
-		end
+--	set_planet_id(id: INTEGER)
+--		do
+--			planet_id := id
+--		end
 
 	set_check_flag(b: BOOLEAN)
 		do
@@ -92,17 +64,17 @@ feature --commands
 		end
 
 
-	set_row(row : INTEGER)
-		do
-			r := row
+--	set_row(row : INTEGER)
+--		do
+--			r := row
 
-		end
+--		end
 
-	set_column(col : INTEGER)
-		do
-			c := col
+--	set_column(col : INTEGER)
+--		do
+--			c := col
 
-		end
+--		end
 
 	set_turn(turn : INTEGER)
 		do
@@ -119,15 +91,15 @@ feature --commands
 
 		end
 
---	set_prev_quadrant(qua: INTEGER)
---		do
---			prev_quadrant := qua
---		end
-
-	set_quadrant(index: INTEGER)
+	set_prev_quadrant(qua: INTEGER)
 		do
-			quadrant := index
+			prev_quadrant := qua
 		end
+
+--	set_quadrant(index: INTEGER)
+--		do
+--			quadrant := index
+--		end
 
 	set_new_quadrant(new_q: INTEGER)
 		do
@@ -197,7 +169,7 @@ feature -- query
 		do
 			create Result.make_empty
 			Result.append("[")
-			Result.append_integer_64 (planet_id)
+			Result.append_integer_64 (movable_id)
 			Result.append(",P]->attached?:")
 			if star_val ~ False then
 				Result.append("F, ")
