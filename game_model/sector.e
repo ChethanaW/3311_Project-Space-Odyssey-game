@@ -77,12 +77,18 @@ feature -- commands
 			component: ENTITY_ALPHABET
 			turn :INTEGER
 			p : PLANET
+			m : MALEVOLENT
+			b : BENIGN
+			a : ASTEROID
+			j : JANITAUR
 			movables : MOVABLE --changes did %%%%%%%%%%%%%%%%%%%%%%%%%
 			i : INTEGER
 
 		do
 			number_items := gen.rchoose (1, shared_info.max_capacity-1)  -- MUST decrease max_capacity by 1 to leave space for Explorer (so a max of 3)
 			i := 1
+--			create p.make
+--			movables := p
 
 			from
 				loop_counter := 1
@@ -93,15 +99,23 @@ feature -- commands
 
 				if threshold < shared_info.asteroid_threshold then
 					create component.make('A')
+					create a.make
+					movables := a
 				else
 					if threshold < shared_info.janitaur_threshold then
 						create component.make('J')
+						create j.make
+						movables := j
 					else
 						if (threshold < shared_info.malevolent_threshold) then
 							create component.make('M')
+							create m.make
+							movables := m
 						else
 							if (threshold < shared_info.benign_threshold) then
 								create component.make('B')
+								create b.make
+								movables := b
 							else
 								if threshold < shared_info.planet_threshold then
 									create component.make('P')
@@ -116,19 +130,22 @@ feature -- commands
 					end
 				end
 
-				movables.set_row (row) -- changes did  %%%%%%%%%%%%%%%%%%%%%%%%%
-				movables.set_column (column) -- changes did  %%%%%%%%%%%%%%%%%%%%%%%%%
-				movables.set_quadrant (i)
-				movables.set_id (shared_info.movables_id)
-				movables.set_entity_alphabet(component)
+				if attached movables and attached component then
+					movables.set_row (row) -- changes did  %%%%%%%%%%%%%%%%%%%%%%%%%
+					movables.set_column (column) -- changes did  %%%%%%%%%%%%%%%%%%%%%%%%%
+					movables.set_quadrant (i)
+					movables.set_id (shared_info.movables_id)
+					movables.set_entity_alphabet(component)
 
-				component.represents_movable_id (movables.movable_id)
-				shared_info.movables_entity_list.force(component, shared_info.movables_entity_list.count + 1)
+					component.represents_movable_id (movables.movable_id)
+					shared_info.movables_entity_list.force(component, shared_info.movables_entity_list.count + 1)
 
-				shared_info.shared_set_movables_id(shared_info.movables_id + 1) -- increment planet_id value for the next planet object generated
+					shared_info.shared_set_movables_id(shared_info.movables_id + 1) -- increment planet_id value for the next planet object generated
 
 
-				shared_info.movables_list.force (movables, shared_info.movables_list.count + 1)
+					shared_info.movables_list.force (movables, shared_info.movables_list.count + 1)
+				end
+
 
 				if attached component as entity then
 					put (entity) -- add new entity to the contents list
@@ -139,12 +156,12 @@ feature -- commands
 					-- The turn value of a movable entity (except explorer) suggests the number of turns left before it can move.
 					--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-					if threshold < shared_info.planet_threshold then
-						if attached p then
-							p.set_turn (turn)
-						end
 
+					if attached movables then
+						movables.set_turn (turn)
 					end
+
+
 
 					component := void -- reset component object
 				end

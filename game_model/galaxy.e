@@ -329,7 +329,7 @@ feature --commands
 
 
 
-	movement(p: PLANET)
+	movement(movable_obj: MOVABLE)
 		local
 			temp_row : INTEGER
 			temp_column : INTEGER
@@ -350,8 +350,8 @@ feature --commands
 					direction := d.num_dir (dir)
 					create letter_planet.make ('P')
 
-					temp_row := p.get_row + direction.first
-					temp_column := p.c + direction.last
+					temp_row := movable_obj.get_row + direction.first
+					temp_column := movable_obj.c + direction.last
 					if temp_row > 5 then
 						temp_row := 1
 					elseif temp_row < 1 then
@@ -364,116 +364,119 @@ feature --commands
 					end
 
 
-					get_planet_quadrant(p, p.r, p.c)
+					get_movable_quadrant(movable_obj, movable_obj.r, movable_obj.c)
 
-					grid[p.r, p.c].contents.go_i_th (p.quadrant)
+					grid[movable_obj.r, movable_obj.c].contents.go_i_th (movable_obj.quadrant)
 					--print("the planet and sector are ")print(p.planet_id)print(" and ")print(p.quadrant)print(" and the row and column are ")print(p.r)print(p.c)
 
-					grid[p.r, p.c].contents.replace (letter_replacement)
+					grid[movable_obj.r, movable_obj.c].contents.replace (letter_replacement)
 
 					if not grid[temp_row, temp_column].is_full then -- if there's an empty space or there's '-'
 					-- print("the target sector is not full ")print("%N")
 						across grid[temp_row, temp_column].contents is entity loop
 							if entity ~ letter_replacement then
-								grid[temp_row, temp_column].contents.put (letter_planet)
+								grid[temp_row, temp_column].contents.put (movable_obj.entity_alphabet )
 								placed_on_letter_replacement := true
 							end
 						end
 						if not placed_on_letter_replacement then
-							grid[temp_row, temp_column].contents.force (letter_planet)
+							grid[temp_row, temp_column].contents.force (movable_obj.entity_alphabet)
 						end
-						letter_planet.represents_planet_id(p.planet_id)
-						p.set_prev_r_c(p.r,p.c)
-						p.set_entity_alphabet (letter_planet)
-						p.set_row (temp_row)
-						p.set_column (temp_column)
-					--	print("after moving, the entity plant id is")print(letter_planet.entity_planet_id)print("%N")print("%N")
-						move_planet_list.force (p, p_move_index)
-						p_move_index := p_move_index + 1
-						--print(" and move to row and column ")print(p.r)print(" ")print(p.c)print(" ")print(p.quadrant)print("%N")
+						movable_obj.entity_alphabet.represents_movable_id(movable_obj.movable_id)
+						movable_obj.set_prev_r_c(movable_obj.r,movable_obj.c)
+						movable_obj.set_entity_alphabet (movable_obj.entity_alphabet)
+						movable_obj.set_row (temp_row)
+						movable_obj.set_column (temp_column)
+						--print("after moving, the entity movable id is")print(movable_obj.entity_alphabet.entity_movable_id )print("%N")print("%N")
+						move_movable_list.force (movable_obj, movables_move_index)
+						movables_move_index := movables_move_index + 1
+						--print(" and move to row and column ")print(movable_obj.r)print(" ")print(movable_obj.c)print(" ")print(movable_obj.quadrant)print("%N")
 					end
 
-					across grid[p.get_row, p.get_col].contents is val loop
-						if val.is_star then
-							p.star_value(True)
+					if movable_obj.entity_alphabet ~ Create{ENTITY_ALPHABET}.make ('P') then
+						across grid[movable_obj.get_row, movable_obj.get_col].contents is val loop
+							if val.is_star then
+								movable_obj.star_value(True)
+							end
 						end
 					end
+
 
 		end
 
-	move_planets
-		local
-			row_counter: INTEGER
-			col_counter: INTEGER
-			sector_counter: INTEGER
-			turn :INTEGER
-			p: PLANET
-			temp: ARRAY[PLANET]
-			yellow_dwarf: INTEGER
-			num: INTEGER
-			new_q: INTEGER
+--	move_planets
+--		local
+--			row_counter: INTEGER
+--			col_counter: INTEGER
+--			sector_counter: INTEGER
+--			turn :INTEGER
+--			p: PLANET
+--			temp: ARRAY[PLANET]
+--			yellow_dwarf: INTEGER
+--			num: INTEGER
+--			new_q: INTEGER
 
-		do
-			create temp.make_empty
-			temp.compare_objects
-			yellow_dwarf := 0
+--		do
+--			create temp.make_empty
+--			temp.compare_objects
+--			yellow_dwarf := 0
 
-			across shared_info.planet_list is planet loop
-				--print("[")print(planet.get_row)print(" ") print(planet.get_col)print("]")print(" ")
---				print(planet.at)
---				print("[")print(i)print("]")
---				i:= i + 1
---				print("before decrementing turn ")
---				print(planet.get_turn)
---				print(" ")
---				print("%N")
---				print("the row and column of planet are ") print(planet.get_row) print(" and ") print(planet.get_col)
+--			across shared_info.planet_list is planet loop
+--				--print("[")print(planet.get_row)print(" ") print(planet.get_col)print("]")print(" ")
+----				print(planet.at)
+----				print("[")print(i)print("]")
+----				i:= i + 1
+----				print("before decrementing turn ")
+----				print(planet.get_turn)
+----				print(" ")
+----				print("%N")
+----				print("the row and column of planet are ") print(planet.get_row) print(" and ") print(planet.get_col)
 
-				--planet.star_value(False)
-				if planet.get_turn = 0 then
-				across grid[planet.get_row, planet.get_col].contents is val loop
-					if val.is_star then
-						planet.star_value(True)
-						if val.item ~ 'Y' then
-							planet.has_yellow_dwarf(true)
-						else
-							planet.has_yellow_dwarf(false)
-						end
-					end
-				end
-				end
+--				--planet.star_value(False)
+--				if planet.get_turn = 0 then
+--				across grid[planet.get_row, planet.get_col].contents is val loop
+--					if val.is_star then
+--						planet.star_value(True)
+--						if val.item ~ 'Y' then
+--							planet.has_yellow_dwarf(true)
+--						else
+--							planet.has_yellow_dwarf(false)
+--						end
+--					end
+--				end
+--				end
 
 
-				if planet.get_turn = 0 then
-					if planet.has_star = true then
-						if planet.yellow_dwarf = true and not planet.has_checked_for_life then
-							num := gen.rchoose(1, 2) -- num=2 means life
-							if num = 2 then
-								planet.support_life(true)
-							end
-							planet.set_check_flag(TRUE)
-						end
-					else
-						movement(planet)
-						get_planet_new_quadrant(planet, planet.r, planet.c)
+--				if planet.get_turn = 0 then
+--					if planet.has_star = true then
+--						if planet.yellow_dwarf = true and not planet.has_checked_for_life then
+--							num := gen.rchoose(1, 2) -- num=2 means life
+--							if num = 2 then
+--								planet.support_life(true)
+--							end
+--							planet.set_check_flag(TRUE)
+--						end
+--					else
+--						movement(planet)
+--						get_movable_new_quadrant(planet, planet.r, planet.c)
 
-						if planet.has_star = false then
-							turn:=gen.rchoose (0, 2)
-						end
-						planet.set_turn(turn)
-					end
-				else
-					planet.set_turn(planet.get_turn - 1)
-				end
+--						if planet.has_star = false then
+--							turn:=gen.rchoose (0, 2)
+--						end
+--						planet.set_turn(turn)
+--					end
+--				else
+--					planet.set_turn(planet.get_turn - 1)
+--				end
 
---				print("before decrementing turn ")
---				print(planet.get_turn)
---				print(" ")
---				print("%N")
+----				print("before decrementing turn ")
+----				print(planet.get_turn)
+----				print(" ")
+----				print("%N")
 
-			end
+--			end
 
-		end --move planets
+--		end --move planets
 
 	move_movables  --planet, benign, malevolent,janitaur, asteroid (5)
 		local
@@ -492,41 +495,46 @@ feature --commands
 			temp.compare_objects
 			yellow_dwarf := 0
 
-			across shared_info.movables_list is movable_objects loop
---				if movable_objects.get_turn = 0 then
---				across grid[planet.get_row, planet.get_col].contents is val loop
---					if val.is_star then
---						planet.star_value(True)
---						if val.item ~ 'Y' then
---							planet.has_yellow_dwarf(true)
---						else
---							planet.has_yellow_dwarf(false)
---						end
---					end
---				end
---				end
+			across shared_info.movables_list is movable_object loop
+				if movable_object.get_turn = 0 then
+				across grid[movable_object.get_row, movable_object.get_col].contents is val loop
+					if val.is_star then
+						movable_object.star_value(True)
+						if val.item ~ 'Y' then
+							movable_object.has_yellow_dwarf(true)
+						else
+							movable_object.has_yellow_dwarf(false)
+						end
+					end
+				end
+				end
 
 
-				if planet.get_turn = 0 then
-					if planet.has_star = true then
-						if planet.yellow_dwarf = true and not planet.has_checked_for_life then
+				if movable_object.get_turn = 0 then
+					if movable_object.entity_alphabet ~ create{ENTITY_ALPHABET}.make ('P') and movable_object.has_star = true then
+						if movable_object.yellow_dwarf = true and not movable_object.has_checked_for_life then
 							num := gen.rchoose(1, 2) -- num=2 means life
 							if num = 2 then
-								planet.support_life(true)
+								movable_object.support_life(true)  --%%%%%%%%%%%%%%%%%%%%%%%%%%%% stopped checking
 							end
-							planet.set_check_flag(TRUE)
+							movable_object.set_check_flag(TRUE)
 						end
 					else
-						movement(planet)
-						get_planet_new_quadrant(planet, planet.r, planet.c)
+						movement(movable_object)  ---continue from here
+						get_movable_new_quadrant(movable_object, movable_object.r, movable_object.c)
 
-						if planet.has_star = false then
-							turn:=gen.rchoose (0, 2)
+						if movable_object.entity_alphabet ~ create {ENTITY_ALPHABET}.make ('P') then
+							if movable_object.has_star = false then
+								turn:=gen.rchoose (0, 2)
+							end
+						else
+							turn:=gen.rchoose(0,2)
 						end
-						planet.set_turn(turn)
+
+						movable_object.set_turn(turn)
 					end
 				else
-					planet.set_turn(planet.get_turn - 1)
+					movable_object.set_turn(movable_object.get_turn - 1)
 				end
 
 --				print("before decrementing turn ")
@@ -566,17 +574,18 @@ feature -- query
 			end
 		end
 
-	get_planet_quadrant(planet: PLANET; row: INTEGER; col: INTEGER)
+	get_movable_quadrant(movable_obj: MOVABLE; row: INTEGER; col: INTEGER)
 		local
 			quadrant : INTEGER
+
 		do
 			quadrant := 1
 			-- print("the planet id is ")print(planet.planet_id)print("planet row and col ")print(planet.r)print(" ")print(planet.c)print("%N")
 			across grid[row, col].contents is entity loop
-				if entity ~ letter_p then
+				if entity ~ movable_obj.entity_alphabet  then
 				--	print("the entityplanetid is ")print(entity.entity_planet_id)print(" and the planetid is ")print(planet.planet_id)print("%N")
-					if entity.entity_planet_id ~ planet.planet_id then
-						planet.set_quadrant (quadrant)
+					if entity.entity_movable_id ~ movable_obj.movable_id then
+						movable_obj.set_quadrant (quadrant)
 --						print("the entity planet id is ")print(entity.entity_planet_id)print("%N")
 --						print(" afjdslj;fadkkfa;ldsajf ")print(planet.planet_id)print(" ")print(planet.quadrant)print("%N")
 					end
@@ -585,15 +594,15 @@ feature -- query
 			end
 		end
 
-	get_planet_new_quadrant(planet: PLANET; row: INTEGER; col: INTEGER)
+	get_movable_new_quadrant(movable_obj: MOVABLE; row: INTEGER; col: INTEGER)
 		local
 			new_q: INTEGER
 		do
 			new_q := 1
-			across grid[planet.r, planet.c].contents is entity loop
-				if entity ~ letter_p then
-					if entity.entity_planet_id ~ planet.planet_id then
-						planet.set_new_quadrant (new_q)
+			across grid[movable_obj.r, movable_obj.c].contents is entity loop
+				if entity ~ movable_obj.entity_alphabet then
+					if entity.entity_movable_id ~ movable_obj.movable_id then
+						movable_obj.set_new_quadrant (new_q)
 					end
 				end
 				new_q := new_q + 1
@@ -608,8 +617,8 @@ feature -- query
 			Result := false
 			across grid[ex.exp_coordinates.row, ex.exp_coordinates.column].contents is entity loop
 				if entity ~ letter_p then
-					across shared_info.planet_list is planet loop
-						if entity.entity_planet_id ~ planet.planet_id and planet.supports_life = true then
+					across shared_info.movables_list is movables loop
+						if movables.entity_alphabet ~ create {ENTITY_ALPHABET}.make('P') and entity.entity_movable_id ~ movables.movable_id and movables.supports_life = true then
 							Result := true
 						end
 					end
@@ -621,9 +630,12 @@ feature -- query
 	out_movement:STRING
 	 	local
 	 		prev_p:PLANET
+	 		prev_movable: MOVABLE
 		do
 			create Result.make_empty
 			create prev_p.make
+
+
 			Result.append ("  ")
 			Result.append ("  ")
 			if not shared_info.explorer.landed then
@@ -656,39 +668,46 @@ feature -- query
 --			Result.append ("]")
 
 			--print("[0,E]")print(ex.exp_prev_coordinates.row)print(" " )print(ex.exp_prev_coordinates.column)print("->")print(ex.exp_coordinates.row)print(" ")print(ex.exp_coordinates.column)print("%N")
-			across move_planet_list is p loop
-				if(prev_p.planet_id ~ p.planet_id) then
-				else
-					Result.append ("%N")
-					Result.append ("  ")
-					Result.append ("  ")
-					Result.append ("[")
-					Result.append_integer_64 (p.planet_id)
-					Result.append (",P]:[")
-					Result.append_integer_64 (p.prev_r)
-					Result.append (",")
-					Result.append_integer_64 (p.prev_c)
-					Result.append (",")
-					Result.append_integer_64 (p.quadrant)
-					Result.append ("]->[")
-					Result.append_integer_64 (p.r)
-					Result.append (",")
-					Result.append_integer_64 (p.c)
-					Result.append (",")
-					Result.append_integer_64 (p.new_quadrant)
-					Result.append ("]")
-				end
+			across move_movable_list is movable loop
+				--Result.append_integer_64 (movable.movable_id)
+--				if attached prev_movable then
+--					if(prev_movable.movable_id ~ movable.movable_id) then
+--					else
+						Result.append ("%N")
+						Result.append ("  ")
+						Result.append ("  ")
+						Result.append ("[")
+						Result.append_integer_64 (movable.movable_id)
+						Result.append (",")
+						Result.append_character(movable.entity_alphabet.item)
+						Result.append ("]:[")
+						Result.append_integer_64 (movable.prev_r)
+						Result.append (",")
+						Result.append_integer_64 (movable.prev_c)
+						Result.append (",")
+						Result.append_integer_64 (movable.quadrant)
+						Result.append ("]->[")
+						Result.append_integer_64 (movable.r)
+						Result.append (",")
+						Result.append_integer_64 (movable.c)
+						Result.append (",")
+						Result.append_integer_64 (movable.new_quadrant)
+						Result.append ("]")
+--					end
 
 
-				prev_p := p
-				--print(" and move to row and column ")print(p.r)print(" ")print(p.c)print(" ")print(p.quadrant)print("%N")
+--					prev_movable := movable
+					--print(" and move to row and column ")print(p.r)print(" ")print(p.c)print(" ")print(p.quadrant)print("%N")
+
+				--end
+
 			end
---			print("move planet count")
---			print(move_planet_list.count)
-			move_planet_list.remove_head(move_planet_list.count )
+--			print("movable count")
+--			print(move_movable_list.count)
+			move_movable_list.remove_head(move_movable_list.count )
 --			print("%N")
---			print("move planet count after remove head")
---			print(move_planet_list.count)
+--			print("movable count after remove head")
+--			print(move_movable_list.count)
 
 		end
 
@@ -749,11 +768,11 @@ feature -- query
 				Result.append(ex.get_description)
 			end
 
-			across shared_info.planet_list is planet loop
+			across shared_info.movables_list is movables loop
 					Result.append("%N")
 					Result.append ("  ")
 					Result.append ("  ")
-					Result.append (planet.get_description)
+					Result.append (movables.get_description)
 
 			end
 		shared_info.stationary_list.remove_head(move_planet_list.count )
@@ -771,6 +790,7 @@ feature -- query
 			temp_component: ENTITY_ALPHABET
 			printed_symbols_counter: INTEGER
 			planet : PLANET
+			movable : MOVABLE
 			check_sector: SECTOR
 			temp_row: INTEGER
 			temp_column: INTEGER
@@ -823,8 +843,24 @@ feature -- query
 								string1.append (ex.sector_out_info)
 							elseif temp_component ~ create {ENTITY_ALPHABET}.make('P') then
 								string1.append ("[")
-								string1.append_integer_64 (temp_component.entity_planet_id)
+								string1.append_integer_64 (temp_component.entity_movable_id)
 								string1.append (",P]")
+							elseif temp_component ~ create {ENTITY_ALPHABET}.make('B') then
+								string1.append ("[")
+								string1.append_integer_64 (temp_component.entity_movable_id)
+								string1.append (",B]")
+							elseif temp_component ~ create {ENTITY_ALPHABET}.make('M') then
+								string1.append ("[")
+								string1.append_integer_64 (temp_component.entity_movable_id)
+								string1.append (",M]")
+							elseif temp_component ~ create {ENTITY_ALPHABET}.make('J') then
+								string1.append ("[")
+								string1.append_integer_64 (temp_component.entity_movable_id)
+								string1.append (",J]")
+							elseif temp_component ~ create {ENTITY_ALPHABET}.make('A') then
+								string1.append ("[")
+								string1.append_integer_64 (temp_component.entity_movable_id)
+								string1.append (",A]")
 							elseif temp_component ~ create {ENTITY_ALPHABET}.make('O') then
 								string1.append ("[-")
 								string1.append_integer_64 (temp_component.entity_blackhole_id)

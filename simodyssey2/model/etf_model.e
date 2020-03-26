@@ -147,7 +147,8 @@ feature -- model operations
 			--	g.ex.update_landed_status(TRUE)
 
 				info.explorer.update_landed_status (true)  -------###### double check if this is correct the case if no life we still land or not
-				g.move_planets
+				--g.move_planets
+				g.move_movables
 			end
 
 			update_status
@@ -188,7 +189,8 @@ feature -- model operations
 					error:= TRUE
 					error_message:= info.get_error_messages (8)
 				end
-				g.move_planets
+				--g.move_planets
+				g.move_movables
 	 			board_print := g.out
 	 			-- print(explorer.fuel)
 	 			if g.fuel_check then -- out of fuel
