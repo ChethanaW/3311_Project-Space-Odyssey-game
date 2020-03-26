@@ -27,6 +27,7 @@ feature {NONE} -- Initialization
 			visited := false
 			create sector_out_info.make_empty
 			create death_message.make_empty
+			is_dead := FALSE
 
 		end
 feature -- model attributes

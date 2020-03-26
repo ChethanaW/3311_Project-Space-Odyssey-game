@@ -10,6 +10,8 @@ deferred class
 feature -- common features
 	movable_id: INTEGER  -- ref -> planet_id : INTEGER
 
+	is_dead: BOOLEAN
+
 	death_message: STRING
 
 	r: INTEGER
@@ -51,6 +53,11 @@ feature -- common features
 
 
 feature -- commands
+
+	set_is_dead(status: BOOLEAN)
+		do
+			is_dead:= status
+		end
 
 	set_visited(status: BOOLEAN)
 		do
