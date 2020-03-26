@@ -532,7 +532,7 @@ feature --commands
 						end
 					else
 
-						if check_for_wormhole and movable_object.entity_alphabet ~ create{ENTITY_ALPHABET}.make ('M') or movable_object.entity_alphabet ~ create{ENTITY_ALPHABET}.make ('B') then
+						if movable_check_for_wormhole(movable_object) and movable_object.entity_alphabet ~ create{ENTITY_ALPHABET}.make ('M') or movable_object.entity_alphabet ~ create{ENTITY_ALPHABET}.make ('B') then
 							movable_wormhole_move(movable_object)
 						else
 							movement(movable_object)  ---continue from here
@@ -654,7 +654,7 @@ feature --commands
 
 
 
-	wormhole_move(a_ent: ENTITY_ALPHABET)
+	wormhole_move
 
 		local
 			temp_row : INTEGER
@@ -686,9 +686,8 @@ feature --commands
 				-- Result := TRUE
 				shared_info.explorer.set_is_dead(true)
 				across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is value loop
-					if value ~ a_ent then
+					if value ~ create{ENTITY_ALPHABET}.make ('E') then
 						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.go_i_th (pointer)
-
 						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.replace (letter_replacement)
 					end
 					pointer:= pointer + 1
@@ -699,19 +698,19 @@ feature --commands
 			else
 
 			if not grid[temp_row, temp_col].is_full then -- if there's an empty space or there's '-'
-				grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.go_i_th(quadrant)
+				grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.go_i_th(shared_info.explorer.prev_quadrant)
 				grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.replace(letter_replacement)
 
 				across grid[temp_row, temp_col].contents is entity loop
 					if entity ~ letter_replacement then
 						shared_info.explorer.update_coord (temp_row, temp_col)
-						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.put (a_ent)
+						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.put (shared_info.explorer.letter)
 						placed_on_letter_replacement := true
 					end
 				end
 					if not placed_on_letter_replacement then
 						shared_info.explorer.update_coord (temp_row, temp_col)
-						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.force (a_ent)
+						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.force (shared_info.explorer.letter)
 					end
 					quadrant := 1
 					across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity
@@ -727,7 +726,7 @@ feature --commands
 				-- wormhole directed explorer to full sector... do
 			end
 		end
-		grid[last_coord.exp_coordinates.row,last_coord.exp_coordinates.column].contents.prune_all (a_ent)
+		-- grid[last_coord.exp_coordinates.row,last_coord.exp_coordinates.column].contents.prune_all (a_ent)
 	end
 
 	visit_planet
@@ -787,6 +786,17 @@ feature -- query
 			end
 			-- Result := FALSE
 		end
+
+	movable_check_for_wormhole(a_movable: MOVABLE): BOOLEAN
+		do
+			Result:= FALSE
+			across grid[a_movable.r, a_movable.c].contents is entity loop
+				if entity ~ create{ENTITY_ALPHABET}.make('W') then
+					Result:= TRUE
+				end
+			end
+		end
+
 
 	get_updated_fuel(row: INTEGER; col: INTEGER)
 		do
