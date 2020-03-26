@@ -32,11 +32,9 @@ feature -- Query
             gen := gen_access.debug_gen
 
             Result := gen.num\\(high-low + 1) + low
---<<<<<<< HEAD
-           -- print("RGN ")print(low) print(" ") print(high) print(" ") print(Result) print("%N")
---=======
+
             -- print("RGN ")print(low) print(" ") print(high) print(" ") print(Result) print("%N")
--->>>>>>> 1de10948ec108b113238104e69556c848b9959ee
+
             gen.forth
         end
 

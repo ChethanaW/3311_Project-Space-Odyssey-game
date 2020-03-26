@@ -43,9 +43,9 @@ feature -- attributes
 
 	fuel_check: BOOLEAN
 
-	ex: EXPLORER
+	-- --ex: EXPLORER
 
-	last_coord: like ex
+	 last_coord: EXPLORER
 
 	move_planet_list : ARRAY[PLANET]
 	p_move_index: INTEGER
@@ -93,9 +93,9 @@ feature --constructor
 			create explorer.make ('E')
 			create letter_p.make('P')
 			turn_flag := 0
-			create ex.make
+			-- create ex.make
 			create last_coord.make
-			last_coord := ex.deep_twin
+			last_coord := shared_info.explorer.deep_twin
 			flag := 0
 
 			create letter_replacement.make('-')
@@ -122,9 +122,9 @@ feature -- constructor
 			--last_coord := player_coord.deep_twin
 			create explorer.make ('E')
 			create letter_p.make('P')
-			create ex.make
+			-- create ex.make
 			create last_coord.make
-			last_coord := ex.deep_twin
+			last_coord := shared_info.explorer.deep_twin
 			create letter_replacement.make('-')
 			create move_planet_list.make_empty
 
@@ -231,14 +231,14 @@ feature --commands
 			pointer := 1
 
 
-			last_coord := ex.deep_twin -- update last coord
+			last_coord := shared_info.explorer.deep_twin -- update last coord
 
-			ex.set_prev_coord (last_coord.exp_coordinates.row,last_coord.exp_coordinates.column)
+			shared_info.explorer.set_prev_coord (last_coord.exp_coordinates.row,last_coord.exp_coordinates.column)
 			quadrant := 1
 			across grid[last_coord.exp_coordinates.row, last_coord.exp_coordinates.column].contents is entity
 			loop
 				if entity ~ create{ENTITY_ALPHABET}.make('E') then
-					ex.set_prev_quadrant (quadrant)
+					shared_info.explorer.set_prev_quadrant (quadrant)
 				end
 				quadrant := quadrant +1
 			end
@@ -262,30 +262,30 @@ feature --commands
 			if temp_row = 3 and temp_col = 3 then
 				Result := TRUE
 				shared_info.explorer.set_is_dead(true)
-				across grid[ex.exp_coordinates.row, ex.exp_coordinates.column].contents is value loop
+				across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is value loop
 					if value ~ a_explorer then
-						grid[ex.exp_coordinates.row, ex.exp_coordinates.column].contents.go_i_th (pointer)
+						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.go_i_th (pointer)
 
-						grid[ex.exp_coordinates.row, ex.exp_coordinates.column].contents.replace (letter_replacement)
+						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.replace (letter_replacement)
 					end
 					pointer:= pointer + 1
 				end
-				ex.update_coord(temp_row, temp_col)
+				shared_info.explorer.update_coord(temp_row, temp_col)
 --				shared_info.explorer.set_prev_quadrant(2)
-				ex.set_quadrant(2)
+				shared_info.explorer.set_quadrant(2)
 			else
 
 			if not grid[temp_row, temp_col].is_full then -- if there's an empty space or there's '-'
 				across grid[temp_row, temp_col].contents is entity loop
 					if entity ~ letter_replacement then
-						ex.update_coord (temp_row, temp_col)
-						grid[ex.exp_coordinates.row, ex.exp_coordinates.column].contents.put (a_explorer)
+						shared_info.explorer.update_coord (temp_row, temp_col)
+						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.put (a_explorer)
 						placed_on_letter_replacement := true
 					end
 				end
 					if not placed_on_letter_replacement then
-						ex.update_coord (temp_row, temp_col)
-						grid[ex.exp_coordinates.row, ex.exp_coordinates.column].contents.force (a_explorer)
+						shared_info.explorer.update_coord (temp_row, temp_col)
+						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.force (a_explorer)
 --						quadrant := 1
 --						across grid[ex.exp_coordinates.row, ex.exp_coordinates.column].contents is entity
 --						loop
@@ -296,18 +296,26 @@ feature --commands
 --						end
 					end
 					quadrant := 1
-					across grid[ex.exp_coordinates.row, ex.exp_coordinates.column].contents is entity
+					shared_info.explorer.set_yellow_dwarf(false)
+					shared_info.explorer.set_yellow_dwarf(false)
+					across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity
 						loop
 							if entity ~ create{ENTITY_ALPHABET}.make('E') then
-								ex.set_quadrant (quadrant)
+								shared_info.explorer.set_quadrant (quadrant)
+							end
+							if entity ~ create{ENTITY_ALPHABET}.make('Y') then
+								shared_info.explorer.set_yellow_dwarf(true)
+							end
+							if entity ~ create{ENTITY_ALPHABET}.make('P') then
+								shared_info.explorer.set_has_planets(true)
 							end
 						quadrant := quadrant +1
 					end
-				get_updated_fuel(ex, ex.exp_coordinates.row, ex.exp_coordinates.column) -- print(ex.fuel)
-				shared_info.explorer.update_coord(ex.exp_coordinates.row, ex.exp_coordinates.column)
-				if ex.fuel < 1 then
-					grid[ex.exp_coordinates.row, ex.exp_coordinates.column].contents.go_i_th (pointer)
-					grid[ex.exp_coordinates.row, ex.exp_coordinates.column].contents.replace (letter_replacement)
+				get_updated_fuel(shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column) -- print(ex.fuel)
+				-- shared_info.explorer.update_coord(ex.exp_coordinates.row, ex.exp_coordinates.column)
+				if shared_info.explorer.fuel < 1 then
+					grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.go_i_th (pointer)
+					grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.replace (letter_replacement)
 				end
 				Result := TRUE
 			else
@@ -550,26 +558,153 @@ feature --commands
 
 
 
+	wormhole_move(a_ent: ENTITY_ALPHABET)
+
+		local
+			temp_row : INTEGER
+			temp_col : INTEGER
+			placed_on_letter_replacement : BOOLEAN
+			pointer : INTEGER
+			quadrant: INTEGER
+			worm_exists: BOOLEAN
+		do
+			placed_on_letter_replacement := false
+			pointer := 1
+
+			last_coord := shared_info.explorer.deep_twin -- update last coord
+			shared_info.explorer.set_prev_coord (last_coord.exp_coordinates.row,last_coord.exp_coordinates.column)
+
+			quadrant := 1
+			across grid[last_coord.exp_coordinates.row, last_coord.exp_coordinates.column].contents is entity
+			loop
+				if entity ~ create{ENTITY_ALPHABET}.make('E') then
+					shared_info.explorer.set_prev_quadrant (quadrant)
+				end
+				quadrant := quadrant +1
+			end
+
+			temp_row := gen.rchoose(1,5)
+			temp_col := gen.rchoose(1,5)
+
+
+			if temp_row = 3 and temp_col = 3 then
+				-- Result := TRUE
+				shared_info.explorer.set_is_dead(true)
+				across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is value loop
+					if value ~ a_ent then
+						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.go_i_th (pointer)
+
+						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.replace (letter_replacement)
+					end
+					pointer:= pointer + 1
+				end
+				shared_info.explorer.update_coord(temp_row, temp_col)
+--				shared_info.explorer.set_prev_quadrant(2)
+				shared_info.explorer.set_quadrant(2)
+			else
+
+			if not grid[temp_row, temp_col].is_full then -- if there's an empty space or there's '-'
+				across grid[temp_row, temp_col].contents is entity loop
+					if entity ~ letter_replacement then
+						shared_info.explorer.update_coord (temp_row, temp_col)
+						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.put (a_ent)
+						placed_on_letter_replacement := true
+					end
+				end
+					if not placed_on_letter_replacement then
+						shared_info.explorer.update_coord (temp_row, temp_col)
+						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.force (a_ent)
+					end
+					quadrant := 1
+					across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity
+						loop
+							if entity ~ create{ENTITY_ALPHABET}.make('E') then
+								shared_info.explorer.set_quadrant (quadrant)
+							end
+						quadrant := quadrant +1
+					end
+				-- get_updated_fuel(shared_info.explorer, shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column) -- print(ex.fuel)
+			else
+
+				-- wormhole directed explorer to full sector... do
+			end
+		end
+		grid[last_coord.exp_coordinates.row,last_coord.exp_coordinates.column].contents.prune_all (a_ent)
+	end
+
+	visit_planet
+		local
+			flagcheck: BOOLEAN
+		do
+			flagcheck:= FALSE
+			shared_info.set_planet_supports_life(false)
+			across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity loop
+				if not flagcheck then
+				if entity ~ create{ENTITY_ALPHABET}.make('P') then
+					across shared_info.movables_list is movable loop
+						if entity.entity_movable_id ~ movable.movable_id and not movable.visited then -- make sure this works
+							movable.set_visited(TRUE)
+							if movable.supports_life then
+								shared_info.set_planet_supports_life(true)
+							end
+							flagcheck:= TRUE
+						end
+
+					end
+				end
+				end
+			end
+		end
+
 
 
 
 feature -- query
 
-	get_updated_fuel(e: EXPLORER; row: INTEGER; col: INTEGER)
+	all_planets_visited: BOOLEAN
 		do
-			e.update_fuel(e.fuel - 1)
-			across grid[row, col].contents is entity loop
-				if entity ~ create{ENTITY_ALPHABET}.make('*') then
-					e.update_fuel(3)
-					-- print("herererer")
-				elseif entity ~ create{ENTITY_ALPHABET}.make('Y') then
-					e.update_fuel(3)
-				end
-				if e.fuel > 3 then
-					e.update_fuel(3)
+			Result:= TRUE
+			across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity loop
+				if entity ~ create{ENTITY_ALPHABET}.make('P') then
+					across shared_info.movables_list is movable loop
+						if entity.entity_movable_id ~ movable.movable_id then
+							if not movable.visited then
+								Result:= FALSE
+							end
+						end
+
+					end
 				end
 			end
-			if e.fuel < 1 then
+		end
+
+	check_for_wormhole: BOOLEAN
+		do
+			--create worm.make('W')
+			Result:= FALSE
+			across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity loop
+				if entity ~ create{ENTITY_ALPHABET}.make('W') then
+					Result := TRUE
+				end
+			end
+			-- Result := FALSE
+		end
+
+	get_updated_fuel(row: INTEGER; col: INTEGER)
+		do
+			shared_info.explorer.update_fuel(shared_info.explorer.fuel - 1)
+			across grid[row, col].contents is entity loop
+				if entity ~ create{ENTITY_ALPHABET}.make('*') then
+					shared_info.explorer.update_fuel(3)
+					-- print("herererer")
+				elseif entity ~ create{ENTITY_ALPHABET}.make('Y') then
+					shared_info.explorer.update_fuel(3)
+				end
+				if shared_info.explorer.fuel > 3 then
+					shared_info.explorer.update_fuel(3)
+				end
+			end
+			if shared_info.explorer.fuel < 1 then
 				fuel_check := true
 			end
 		end
@@ -609,13 +744,12 @@ feature -- query
 			end
 		end
 
-
 	landed_planet: BOOLEAN
 		require
 			-- MUST BE AT YELLOW STAR
 		do
 			Result := false
-			across grid[ex.exp_coordinates.row, ex.exp_coordinates.column].contents is entity loop
+			across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity loop
 				if entity ~ letter_p then
 					across shared_info.movables_list is movables loop
 						if movables.entity_alphabet ~ create {ENTITY_ALPHABET}.make('P') and entity.entity_movable_id ~ movables.movable_id and movables.supports_life = true then
@@ -624,6 +758,7 @@ feature -- query
 					end
 				end
 			end
+
 
 		end
 
@@ -638,34 +773,26 @@ feature -- query
 
 			Result.append ("  ")
 			Result.append ("  ")
-			if not shared_info.explorer.landed then
+		 	if shared_info.skip_explorer_coordinates ~ FALSE then
 				Result.append ("[0,E]:[")
-				Result.append_integer_64 (ex.exp_prev_coordinates.row)
+				Result.append_integer_64 (shared_info.explorer.exp_prev_coordinates.row)
 				Result.append (",")
-				Result.append_integer_64 (ex.exp_prev_coordinates.column)
+				Result.append_integer_64 (shared_info.explorer.exp_prev_coordinates.column)
 				Result.append (",")
-				Result.append_integer_64 (ex.prev_quadrant)
+				Result.append_integer_64 (shared_info.explorer.prev_quadrant)
 				Result.append ("]->[")
-				Result.append_integer_64 (ex.exp_coordinates.row)
+				Result.append_integer_64 (shared_info.explorer.exp_coordinates.row)
 				Result.append (",")
-				Result.append_integer_64 (ex.exp_coordinates.column)
+				Result.append_integer_64 (shared_info.explorer.exp_coordinates.column)
 				Result.append (",")
-				Result.append_integer_64 (ex.quadrant)
+				Result.append_integer_64 (shared_info.explorer.quadrant)
 				Result.append ("]")
+--				Result.append ("%N")
+--				Result.append ("  ")
+--				Result.append ("  ")
+				--Result.append ("%N")
 			end
---			Result.append ("[0,E]:[")
---			Result.append_integer_64 (ex.exp_prev_coordinates.row)
---			Result.append (",")
---			Result.append_integer_64 (ex.exp_prev_coordinates.column)
---			Result.append (",")
---			Result.append_integer_64 (ex.prev_quadrant)
---			Result.append ("]->[")
---			Result.append_integer_64 (ex.exp_coordinates.row)
---			Result.append (",")
---			Result.append_integer_64 (ex.exp_coordinates.column)
---			Result.append (",")
---			Result.append_integer_64 (ex.quadrant)
---			Result.append ("]")
+			-- shared_info.set_skip_explorer_coordinates(FALSE)
 
 			--print("[0,E]")print(ex.exp_prev_coordinates.row)print(" " )print(ex.exp_prev_coordinates.column)print("->")print(ex.exp_coordinates.row)print(" ")print(ex.exp_coordinates.column)print("%N")
 			across move_movable_list is movable loop
@@ -700,6 +827,7 @@ feature -- query
 					--print(" and move to row and column ")print(p.r)print(" ")print(p.c)print(" ")print(p.quadrant)print("%N")
 
 				--end
+
 
 			end
 --			print("movable count")
@@ -761,11 +889,11 @@ feature -- query
 --			Result.append ("%N")
 --			Result.append ("  ")
 --			Result.append ("  ")
-			if ex.fuel > 0 then
+			if shared_info.explorer.fuel > 0 then
 				Result.append ("%N")
 				Result.append ("  ")
 				Result.append ("  ")
-				Result.append(ex.get_description)
+				Result.append(shared_info.explorer.get_description)
 			end
 
 			across shared_info.movables_list is movables loop
@@ -840,7 +968,7 @@ feature -- query
 							end
 							--string1.append_character(character.item) --was 2
 							if temp_component ~ create {ENTITY_ALPHABET}.make('E') then
-								string1.append (ex.sector_out_info)
+								string1.append (shared_info.explorer.sector_out_info)
 							elseif temp_component ~ create {ENTITY_ALPHABET}.make('P') then
 								string1.append ("[")
 								string1.append_integer_64 (temp_component.entity_movable_id)

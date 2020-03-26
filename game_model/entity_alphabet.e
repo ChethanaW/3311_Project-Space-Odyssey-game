@@ -80,6 +80,8 @@ feature -- Query
     		end
     	end
 
+  feature -- Commands
+
     represents_planet_id(planet_id: INTEGER)--; p: PLANET)
     	do
     		entity_planet_id := planet_id
