@@ -109,13 +109,14 @@ feature -- model operations
 			entity_movement:= FALSE
 
 			--empty all lists created at the beginning of pplay and abort
-			info.planet_entity_list.make_empty
-			info.planet_list.make_empty
+			info.movables_entity_list.make_empty
+			info.movables_list.make_empty
 			info.stationary_list.make_empty
+			-- info.movables_entity_list.count
 
 			info.explorer.set_is_dead(false)
 			fuel_check_game_over := false
-			info.shared_set_planet_id (1)
+			info.shared_set_movables_id (1)
 
 			abort_flag := 1
 			play_check := 0
@@ -187,7 +188,7 @@ feature -- model operations
 					cmd_name := "liftoff"
 					info.set_skip_explorer_coordinates(TRUE)
 					entity_movement:=TRUE
-					g.move_planets
+					g.move_movables
 					info.explorer.update_landed_status (false) -- lifting off, not landed anymore
 				else
 					error:=TRUE
@@ -250,7 +251,7 @@ feature -- model operations
 				-- things to do if pass is used at a valid time
 				info.set_skip_explorer_coordinates(TRUE)
 				entity_movement:= TRUE -- bcs planets and others move without the explorer
-				g.move_planets
+				g.move_movables
 			end
 
 			update_status
@@ -362,7 +363,7 @@ feature -- model operations
 				--  explore randomly moves
 				g.wormhole_move(entity)
 				--  planet moves just as if move command was entered
-				g.move_planets
+				g.move_movables
 				end
 
 

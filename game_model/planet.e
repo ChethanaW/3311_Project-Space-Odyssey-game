@@ -112,10 +112,10 @@ feature --commands
 --			star_val := val
 --		end
 
-	set_visited(status: BOOLEAN)
-		do
-			visited:= status
-		end
+--	set_visited(status: BOOLEAN)
+--		do
+--			visited:= status
+--		end
 
 
 feature -- query
@@ -158,10 +158,10 @@ feature -- query
 
 
 
-	is_visited : BOOLEAN
-		do
-			Result := visited
-		end
+--	is_visited : BOOLEAN
+--		do
+--			Result := visited
+--		end
 
 
 --	get_description: STRING

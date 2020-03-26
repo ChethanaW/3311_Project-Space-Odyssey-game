@@ -25,7 +25,7 @@ feature{NONE}
 			skip_explorer_coordinates := FALSE
 			stationary_id:=1
 
-			planet_supports_life:= FALSE 
+			planet_supports_life:= FALSE
 
 			death_message_status := FALSE -- default: no death message
 			create death_message.make_empty
@@ -93,6 +93,7 @@ feature
 	stationary_id: INTEGER
 
 	planet_id : INTEGER
+
 
 	explorer: EXPLORER
 

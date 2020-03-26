@@ -641,10 +641,10 @@ feature --commands
 			across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity loop
 				if not flagcheck then
 				if entity ~ create{ENTITY_ALPHABET}.make('P') then
-					across shared_info.planet_list is planet loop
-						if entity.entity_planet_id ~ planet.planet_id and not planet.visited then -- make sure this works
-							planet.set_visited(TRUE)
-							if planet.supports_life then
+					across shared_info.movables_list is movable loop
+						if entity.entity_movable_id ~ movable.movable_id and not movable.visited then -- make sure this works
+							movable.set_visited(TRUE)
+							if movable.supports_life then
 								shared_info.set_planet_supports_life(true)
 							end
 							flagcheck:= TRUE
@@ -666,9 +666,9 @@ feature -- query
 			Result:= TRUE
 			across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity loop
 				if entity ~ create{ENTITY_ALPHABET}.make('P') then
-					across shared_info.planet_list is planet loop
-						if entity.entity_planet_id ~ planet.planet_id then
-							if not planet.visited then
+					across shared_info.movables_list is movable loop
+						if entity.entity_movable_id ~ movable.movable_id then
+							if not movable.visited then
 								Result:= FALSE
 							end
 						end
@@ -749,7 +749,7 @@ feature -- query
 			-- MUST BE AT YELLOW STAR
 		do
 			Result := false
-			across grid[ex.exp_coordinates.row, ex.exp_coordinates.column].contents is entity loop
+			across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity loop
 				if entity ~ letter_p then
 					across shared_info.movables_list is movables loop
 						if movables.entity_alphabet ~ create {ENTITY_ALPHABET}.make('P') and entity.entity_movable_id ~ movables.movable_id and movables.supports_life = true then
@@ -760,7 +760,7 @@ feature -- query
 			end
 
 
---		end
+		end
 
 	out_movement:STRING
 	 	local
@@ -793,7 +793,7 @@ feature -- query
 				--Result.append ("%N")
 			end
 			-- shared_info.set_skip_explorer_coordinates(FALSE)
-      
+
 			--print("[0,E]")print(ex.exp_prev_coordinates.row)print(" " )print(ex.exp_prev_coordinates.column)print("->")print(ex.exp_coordinates.row)print(" ")print(ex.exp_coordinates.column)print("%N")
 			across move_movable_list is movable loop
 				--Result.append_integer_64 (movable.movable_id)
