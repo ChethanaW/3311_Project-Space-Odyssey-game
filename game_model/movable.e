@@ -52,6 +52,11 @@ feature -- common features
 
 feature -- commands
 
+	set_visited(status: BOOLEAN)
+		do
+			visited:= status
+		end
+
 	set_id(movables_id: INTEGER)
 		do
 			movable_id:= movables_id
@@ -127,6 +132,11 @@ feature -- commands
 
 
 feature --queries
+
+	is_visited : BOOLEAN
+		do
+			Result := visited
+		end
 
 	has_star: BOOLEAN
 		do
