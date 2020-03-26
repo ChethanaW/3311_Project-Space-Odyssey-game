@@ -158,12 +158,14 @@ feature -- model operations
 					land_flag := 1
 				end
 
+
 				--end
 				g.visit_planet
 			--	g.ex.update_landed_status(TRUE)
 				info.set_skip_explorer_coordinates(TRUE)
 				info.explorer.update_landed_status (TRUE)  -------###### double check if this is correct the case if no life we still land or not
-				g.move_planets
+				g.move_movables
+
 			end
 
 			update_status
@@ -224,7 +226,8 @@ feature -- model operations
 					-- error:=TRUE
 					-- error_message:= info.get_error_messages (12)
 				end
-				g.move_planets
+				--g.move_planets
+				g.move_movables
 	 			board_print := g.out
 	 			-- print(explorer.fuel)
 	 			if info.explorer.fuel < 1 then -- out of fuel
