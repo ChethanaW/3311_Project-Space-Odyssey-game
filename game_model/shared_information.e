@@ -24,6 +24,14 @@ feature{NONE}
 			create explorer.make
 
 			stationary_id:=1
+			death_message_status := FALSE -- default: no death message
+			create death_message.make_empty
+
+			-- for movables
+			create movables_list.make_empty
+			create movables_entity_list.make_empty
+			movables_id := 1
+
 
 		end
 
@@ -84,6 +92,17 @@ feature
 
 	explorer: EXPLORER
 
+	death_message_status: BOOLEAN
+
+	death_message: STRING
+
+	--movables
+	movables_list : ARRAY[MOVABLE]
+
+	movables_entity_list: ARRAY[ENTITY_ALPHABET]
+
+	movables_id: INTEGER
+
 
 feature --commands
 	test(a_threshold: INTEGER; j_threshold: INTEGER; m_threshold: INTEGER; b_threshold: INTEGER; p_threshold: INTEGER)
@@ -124,13 +143,23 @@ feature --commands
 			benign_threshold:=threshhold
 		end
 
-
-
-feature --queries
 	shared_set_planet_id(id : INTEGER)
 		do
 			planet_id := id
 		end
+
+	shared_set_movables_id(id : INTEGER)
+		do
+			movables_id := id
+		end
+
+
+
+
+feature --queries
+
+
+
 
 	get_error_messages(error_num: INTEGER): STRING
 		do
@@ -162,6 +191,12 @@ feature --queries
 				Result := "error with no description- something went wrong "
 			end
 
+		end
+
+	get_death_message:STRING
+		do
+			Create Result.make_empty
+			Result := death_message
 		end
 
 end
