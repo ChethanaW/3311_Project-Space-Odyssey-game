@@ -51,8 +51,17 @@ feature -- common features
 
 	sector_out_info: STRING
 
+	fuel: INTEGER
+
+	max_fuel: INTEGER
+
 
 feature -- commands
+
+	set_fuel(value: INTEGER)
+		do
+			fuel := value
+		end
 
 	set_is_dead(status: BOOLEAN)
 		do

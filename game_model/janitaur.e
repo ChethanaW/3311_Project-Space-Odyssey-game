@@ -23,6 +23,8 @@ feature {NONE} -- Initialization
 			create sector_out_info.make_empty
 			create death_message.make_empty
 			is_dead:= FALSE
+			fuel:= 5
+			max_fuel:= 5
 		end
 
 feature -- Access

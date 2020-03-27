@@ -349,10 +349,11 @@ feature --commands
 			placed_on_letter_replacement : BOOLEAN
 			letter_planet : ENTITY_ALPHABET
 --			quadrant : INTEGER
+			pointer: INTEGER
 
 		do
 			-- PLANET with turn 0 and no star
-
+					pointer:= 1
 					placed_on_letter_replacement := False
 					dir := gen.rchoose (1, 8)
 					direction := d.num_dir (dir)
@@ -371,15 +372,7 @@ feature --commands
 						temp_column := 5
 					end
 
-
-					--get_movable_quadrant(movable_obj, movable_obj.r, movable_obj.c)
-
-					--grid[movable_obj.r, movable_obj.c].contents.go_i_th (movable_obj.quadrant)
-					--print("the planet and sector are ")print(p.planet_id)print(" and ")print(p.quadrant)print(" and the row and column are ")print(p.r)print(p.c)
-
-					--grid[movable_obj.r, movable_obj.c].contents.replace (letter_replacement)
-
-					if not grid[temp_row, temp_column].is_full then -- if there's an empty space or there's '-'
+				if not grid[temp_row, temp_column].is_full then -- if there's an empty space or there's '-'
 						get_movable_quadrant(movable_obj, movable_obj.r, movable_obj.c)
 						grid[movable_obj.r, movable_obj.c].contents.go_i_th(movable_obj.quadrant)
 						grid[movable_obj.r, movable_obj.c].contents.replace(letter_replacement)
@@ -412,82 +405,38 @@ feature --commands
 						end
 					end
 
+					if movable_obj.entity_alphabet ~ create{ENTITY_ALPHABET}.make('M') or movable_obj.entity_alphabet ~ create{ENTITY_ALPHABET}.make('B') or movable_obj.entity_alphabet ~ create{ENTITY_ALPHABET}.make('J') then
+						movable_obj.set_fuel(movable_obj.fuel - 1)
+
+					end
+
 
 		end
 
---	move_planets
---		local
---			row_counter: INTEGER
---			col_counter: INTEGER
---			sector_counter: INTEGER
---			turn :INTEGER
---			p: PLANET
---			temp: ARRAY[PLANET]
---			yellow_dwarf: INTEGER
---			num: INTEGER
---			new_q: INTEGER
+		remove_dead(movable_obj: MOVABLE)
+			local
+				pointer: INTEGER
+			do
+				pointer:=1
+				movable_obj.set_is_dead(true) -- --when dead, replace movable_obj.entity_alphabet with a '-'
+							--movable_obj.set_entity_alphabet(letter_replacement)
+				across grid[movable_obj.r, movable_obj.c].contents is value loop
+					if value ~ movable_obj.entity_alphabet and value.entity_movable_id ~ movable_obj.movable_id then
+						grid[movable_obj.r, movable_obj.c].contents.go_i_th (pointer)
+						grid[movable_obj.r, movable_obj.c].contents.replace (letter_replacement)
+					end
+					pointer:= pointer + 1
+				end
 
---		do
---			create temp.make_empty
---			temp.compare_objects
---			yellow_dwarf := 0
+				across shared_info.movables_list is move loop
+					if move.movable_id ~ movable_obj.movable_id then
+					--	shared_info.movables_list.prune_all(movable_obj)
+					end
+				end
 
---			across shared_info.planet_list is planet loop
---				--print("[")print(planet.get_row)print(" ") print(planet.get_col)print("]")print(" ")
-----				print(planet.at)
-----				print("[")print(i)print("]")
-----				i:= i + 1
-----				print("before decrementing turn ")
-----				print(planet.get_turn)
-----				print(" ")
-----				print("%N")
-----				print("the row and column of planet are ") print(planet.get_row) print(" and ") print(planet.get_col)
-
---				--planet.star_value(False)
---				if planet.get_turn = 0 then
---				across grid[planet.get_row, planet.get_col].contents is val loop
---					if val.is_star then
---						planet.star_value(True)
---						if val.item ~ 'Y' then
---							planet.has_yellow_dwarf(true)
---						else
---							planet.has_yellow_dwarf(false)
---						end
---					end
---				end
---				end
+			end
 
 
---				if planet.get_turn = 0 then
---					if planet.has_star = true then
---						if planet.yellow_dwarf = true and not planet.has_checked_for_life then
---							num := gen.rchoose(1, 2) -- num=2 means life
---							if num = 2 then
---								planet.support_life(true)
---							end
---							planet.set_check_flag(TRUE)
---						end
---					else
---						movement(planet)
---						get_movable_new_quadrant(planet, planet.r, planet.c)
-
---						if planet.has_star = false then
---							turn:=gen.rchoose (0, 2)
---						end
---						planet.set_turn(turn)
---					end
---				else
---					planet.set_turn(planet.get_turn - 1)
---				end
-
-----				print("before decrementing turn ")
-----				print(planet.get_turn)
-----				print(" ")
-----				print("%N")
-
---			end
-
---		end --move planets
 
 	move_movables  --planet, benign, malevolent,janitaur, asteroid (5)
 		local
@@ -507,6 +456,9 @@ feature --commands
 			yellow_dwarf := 0
 
 			across shared_info.movables_list is movable_object loop
+				if not movable_object.is_dead then
+
+
 				if movable_object.get_turn = 0 then
 				across grid[movable_object.get_row, movable_object.get_col].contents is val loop
 					if val.is_star then
@@ -538,7 +490,16 @@ feature --commands
 							movement(movable_object)  ---continue from here
 						end
 
-						get_movable_new_quadrant(movable_object, movable_object.r, movable_object.c)
+						get_movable_new_quadrant(movable_object, movable_object.r, movable_object.c) -- this also updates the fuel
+						if movable_object.entity_alphabet /~ create{ENTITY_ALPHABET}.make('P') then
+							if movable_object.fuel < 1 then
+								remove_dead(movable_object)
+							end
+						end
+
+						if movable_object.r ~ 3 and movable_object.c ~ 3 then
+							remove_dead(movable_object)
+						end
 
 						if movable_object.entity_alphabet ~ create {ENTITY_ALPHABET}.make ('P') then
 							if movable_object.has_star = false then
@@ -560,6 +521,7 @@ feature --commands
 --				print("%N")
 
 			end
+			end
 
 		end
 
@@ -576,49 +538,14 @@ feature --commands
 			placed_on_letter_replacement := false
 			pointer := 1
 
-			-- last_coord := shared_info.explorer.deep_twin -- update last coord
-			-- shared_info.explorer.set_prev_coord (last_coord.exp_coordinates.row,last_coord.exp_coordinates.column)
-
-		--	get_movable_quadrant(a_movable, a_movable.r, a_movable.c) -- sets (old) quadrant
-		--	print("the bmovale quadrant is in wormhole ")print(a_movable.quadrant)
-		--	a_movable.set_prev_r_c(a_movable.r, a_movable.c) -- sets previous row and previous column
-
 			temp_row := gen.rchoose(1,5)
 			temp_col := gen.rchoose(1,5)
-
-
-
-			if temp_row = 3 and temp_col = 3 then
-				-- Result := TRUE
-				-- shared_info.explorer.set_is_dead(true)
-				a_movable.set_is_dead(TRUE)
-
-				across grid[a_movable.r, a_movable.c].contents is value loop
-					if value ~ a_movable.entity_alphabet and value.entity_movable_id ~ a_movable.movable_id then
-						grid[a_movable.r, a_movable.c].contents.go_i_th (pointer)
-						grid[a_movable.r, a_movable.c].contents.replace (letter_replacement)
-					end
-					pointer:= pointer + 1
-				end
-
-				a_movable.set_new_quadrant (2)
-				a_movable.set_row(temp_row)
-				a_movable.set_column(temp_col)
-
-			else
 
 
 			if not grid[temp_row, temp_col].is_full then -- if there's an empty space or there's '-'
 				get_movable_quadrant(a_movable, a_movable.r, a_movable.c)
 				grid[a_movable.r, a_movable.c].contents.go_i_th (a_movable.quadrant)
 				grid[a_movable.r, a_movable.c].contents.replace (letter_replacement)
---				across grid[a_movable.r, a_movable.c].contents is value loop
---					if value ~ a_movable.entity_alphabet and value.entity_movable_id ~ a_movable.movable_id then
---						grid[a_movable.r, a_movable.c].contents.go_i_th(pointer)
---						grid[a_movable.r, a_movable.c].contents.replace(letter_replacement)
---					end
---					pointer:= pointer + 1
---				end
 
 				across grid[temp_row, temp_col].contents is entity loop
 					if entity ~ letter_replacement then
@@ -644,14 +571,7 @@ feature --commands
 				-- wormhole directed explorer to full sector... do... edge case
 			end
 
-		end
-		-- grid[last_coord.exp_coordinates.row,last_coord.exp_coordinates.column].contents.prune_all (a_ent)
-		-- grid[a_movable.prev_r, a_movable.prev_c].contents.prune_all (a_movable.entity_alphabet)
 	end
-
-
-
-
 
 
 	wormhole_move
@@ -846,6 +766,15 @@ feature -- query
 				if entity ~ movable_obj.entity_alphabet then
 					if entity.entity_movable_id ~ movable_obj.movable_id then
 						movable_obj.set_new_quadrant (new_q)
+					end
+					if entity ~ create{ENTITY_ALPHABET}.make('Y') then
+						movable_obj.set_fuel(movable_obj.fuel + 2)
+						if movable_obj.fuel > movable_obj.max_fuel then
+							movable_obj.set_fuel(movable_obj.max_fuel)
+						end
+					end
+					if entity ~ create{ENTITY_ALPHABET}.make('*') then
+						movable_obj.set_fuel(movable_obj.max_fuel)
 					end
 				end
 				new_q := new_q + 1
