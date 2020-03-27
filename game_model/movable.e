@@ -16,6 +16,10 @@ feature -- common features
 
 	death_message: STRING
 
+	load: INTEGER -- Only applicable to janitaur
+
+	max_load: INTEGER -- only applicable to janitaur
+
 	r: INTEGER
 
 	c: INTEGER
@@ -67,6 +71,10 @@ feature -- commands
 			fuel := value
 		end
 
+	set_load(value: INTEGER)
+		do
+			load:= value
+		end
 
 	set_clone_when_quadrant_not_full(value: BOOLEAN)
 		do

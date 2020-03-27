@@ -436,6 +436,17 @@ feature --commands
 
 			end
 
+		remove_dead_given_entity_alphabet(a_entity: ENTITY_ALPHABET)
+			do
+				across shared_info.movables_list is obj loop
+					if obj.movable_id ~ a_entity.entity_movable_id then
+						obj.set_is_dead(true)
+						grid[obj.r, obj.c].contents.go_i_th(obj.new_quadrant) -- make sure this value is right
+						grid[obj.r, obj.c].contents.replace(letter_replacement)
+					end
+				end
+			end
+
 
 
 	move_movables  --planet, benign, malevolent,janitaur, asteroid (5)
@@ -505,16 +516,15 @@ feature --commands
 
 						if not movable_object.is_dead then
 							reproduce(movable_object)
+							behave(movable_object)
 						end
 
 						if movable_object.entity_alphabet ~ create {ENTITY_ALPHABET}.make ('P') then
 							if movable_object.has_star = false then
 								turn:=gen.rchoose (0, 2)
+								movable_object.set_turn(turn)
 							end
-						else
-							turn:=gen.rchoose(0,2)
 						end
-						movable_object.set_turn(turn)
 
 					end
 				else
@@ -767,7 +777,60 @@ feature --commands
 			end
 
 
+		behave(a_movable: MOVABLE)
+			local
+				m: ENTITY_ALPHABET
+				b: ENTITY_ALPHABET
+				j: ENTITY_ALPHABET
+				e: ENTITY_ALPHABET
+				a: ENTITY_ALPHABET
+			do
+				create m.make('M')
+				create b.make('B')
+				create j.make('J')
+				create e.make('E')
+				create a.make('A')
 
+				if a_movable.entity_alphabet ~ a then
+					across grid[a_movable.r, a_movable.c].contents is item  loop
+						if item ~ m or item ~ b or item ~ j then
+							remove_dead_given_entity_alphabet(item)
+						end
+						if item ~ e then
+							shared_info.explorer.set_is_dead(TRUE)
+						end
+					end
+					a_movable.set_turn(gen.rchoose(0,2))
+				elseif a_movable.entity_alphabet ~ j then
+					across grid[a_movable.r, a_movable.c].contents is item loop
+						if item ~ a and a_movable.load < 2 then
+							remove_dead_given_entity_alphabet(item)
+							a_movable.set_load(a_movable.load + 1)
+						end
+					end
+					-- janitaur uses the wormhole to clear their load
+					if movable_check_for_wormhole(a_movable) then
+						a_movable.set_load(0)
+					end
+					a_movable.set_turn(gen.rchoose(0,2))
+				elseif a_movable.entity_alphabet ~ b then
+					across grid[a_movable.r, a_movable.c].contents is item loop
+						if item ~ m then
+							remove_dead_given_entity_alphabet(item)
+						end
+					end
+					a_movable.set_turn(gen.rchoose(0,2))
+				elseif a_movable.entity_alphabet ~ m then
+					if movable_check_for_explorer(a_movable) and not movable_check_for_benign(a_movable) and not shared_info.explorer.landed then
+						shared_info.explorer.update_life(shared_info.explorer.life - 1) -- explorer dies if life is at 0
+						if shared_info.explorer.life < 1 then
+							shared_info.explorer.set_is_dead(TRUE)
+						end
+					end
+					a_movable.set_turn(gen.rchoose(0,2))
+
+				end
+		end
 
 feature -- query
 
@@ -805,12 +868,30 @@ feature -- query
 			Result:= FALSE
 			across grid[a_movable.r, a_movable.c].contents is entity loop
 				if entity ~ create{ENTITY_ALPHABET}.make('W') then
-					print("checking for wormhole and the row and column and entity are ")print(a_movable.r)print(a_movable.c)print(a_movable.entity_alphabet)
 					Result:= TRUE
 				end
 			end
 		end
 
+	movable_check_for_benign(a_movable: MOVABLE): BOOLEAN
+		do
+			Result := FALSE
+			across grid[a_movable.r, a_movable.c].contents is entity loop
+				if entity ~ create{ENTITY_ALPHABET}.make ('B') then
+					Result:= TRUE
+				end
+			end
+		end
+
+	movable_check_for_explorer(a_movable: MOVABLE): BOOLEAN
+		do
+			Result:= FALSE
+			across grid[a_movable.r, a_movable.c].contents is entity loop
+				if entity ~ create{ENTITY_ALPHABET}.make ('E') then
+					Result := TRUE
+				end
+			end
+		end
 
 	get_updated_fuel(row: INTEGER; col: INTEGER)
 		do
