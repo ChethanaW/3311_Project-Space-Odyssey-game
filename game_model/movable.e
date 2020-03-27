@@ -10,6 +10,8 @@ deferred class
 feature -- common features
 	movable_id: INTEGER  -- ref -> planet_id : INTEGER
 
+	actions_left_until_reproduction: INTEGER
+
 	is_dead: BOOLEAN
 
 	death_message: STRING
@@ -55,12 +57,25 @@ feature -- common features
 
 	max_fuel: INTEGER
 
+	clone_when_quadrant_not_full: BOOLEAN
+
 
 feature -- commands
 
 	set_fuel(value: INTEGER)
 		do
 			fuel := value
+		end
+
+
+	set_clone_when_quadrant_not_full(value: BOOLEAN)
+		do
+			clone_when_quadrant_not_full:= value
+		end
+
+	set_actions_left_until_reproduction(value: INTEGER)
+		do
+			actions_left_until_reproduction:= value
 		end
 
 	set_is_dead(status: BOOLEAN)

@@ -25,6 +25,8 @@ feature {NONE} -- Initialization
 			is_dead:= FALSE
 			fuel:= 5
 			max_fuel:= 5
+			actions_left_until_reproduction:= 2
+			clone_when_quadrant_not_full:= FALSE
 		end
 
 feature -- Access

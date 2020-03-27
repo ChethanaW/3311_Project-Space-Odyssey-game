@@ -430,7 +430,7 @@ feature --commands
 
 				across shared_info.movables_list is move loop
 					if move.movable_id ~ movable_obj.movable_id then
-					--	shared_info.movables_list.prune_all(movable_obj)
+					--	shared_info.movables_list.prune_all(movable_obj) -- caused program to break... how to deal with dead?
 					end
 				end
 
@@ -484,14 +484,16 @@ feature --commands
 						end
 					else
 
-						if movable_check_for_wormhole(movable_object) and movable_object.entity_alphabet ~ create{ENTITY_ALPHABET}.make ('M') or movable_object.entity_alphabet ~ create{ENTITY_ALPHABET}.make ('B') then
+						if movable_object.entity_alphabet ~ create{ENTITY_ALPHABET}.make ('M') and movable_check_for_wormhole(movable_object) or movable_object.entity_alphabet ~ create{ENTITY_ALPHABET}.make ('B') and  movable_check_for_wormhole(movable_object) then
 							movable_wormhole_move(movable_object)
 						else
 							movement(movable_object)  ---continue from here
 						end
 
 						get_movable_new_quadrant(movable_object, movable_object.r, movable_object.c) -- this also updates the fuel
-						if movable_object.entity_alphabet /~ create{ENTITY_ALPHABET}.make('P') then
+
+
+						if movable_object.entity_alphabet /~ create{ENTITY_ALPHABET}.make('P') then -- planets don't have fuel
 							if movable_object.fuel < 1 then
 								remove_dead(movable_object)
 							end
@@ -499,6 +501,10 @@ feature --commands
 
 						if movable_object.r ~ 3 and movable_object.c ~ 3 then
 							remove_dead(movable_object)
+						end
+
+						if not movable_object.is_dead then
+							reproduce(movable_object)
 						end
 
 						if movable_object.entity_alphabet ~ create {ENTITY_ALPHABET}.make ('P') then
@@ -543,6 +549,8 @@ feature --commands
 
 
 			if not grid[temp_row, temp_col].is_full then -- if there's an empty space or there's '-'
+				print("this went through a wormhole ")print(a_movable.entity_alphabet)print(" ")print(a_movable.movable_id)
+				print("the row and column are ")print(a_movable.r)print(" ")print(a_movable.c)print("%N")
 				get_movable_quadrant(a_movable, a_movable.r, a_movable.c)
 				grid[a_movable.r, a_movable.c].contents.go_i_th (a_movable.quadrant)
 				grid[a_movable.r, a_movable.c].contents.replace (letter_replacement)
@@ -674,6 +682,91 @@ feature --commands
 		end
 
 
+	clone_object(a_movable: MOVABLE; row: INTEGER; col: INTEGER)
+		local
+			m: MALEVOLENT
+			j: JANITAUR
+			b: BENIGN
+			movable_obj: MOVABLE
+			component: ENTITY_ALPHABET
+			quadrant: INTEGER
+			placed_on_letter_replacement: BOOLEAN
+			turn: INTEGER
+		do
+			quadrant:= 1
+			placed_on_letter_replacement:= FALSE
+
+			if a_movable.entity_alphabet ~ create{ENTITY_ALPHABET}.make ('J') then
+				create j.make
+				create component.make('J')
+				movable_obj := j
+			elseif a_movable.entity_alphabet ~ create {ENTITY_ALPHABET}.make ('M') then
+				create m.make
+				create component.make('M')
+				movable_obj:= m
+			else -- a_movable.entity_alphabet ~ create{ENTITY_ALPHABET}.make('B') then
+				create b.make
+				create component.make('B')
+				movable_obj:= b
+			end
+			movable_obj.set_row(row)
+			movable_obj.set_column(col)
+			movable_obj.set_entity_alphabet(component)
+
+			across grid[a_movable.r, a_movable.c].contents is entity loop
+				if entity ~ create{ENTITY_ALPHABET}.make('-') then
+					movable_obj.set_quadrant(quadrant)
+					grid[a_movable.r, a_movable.c].contents.put(movable_obj.entity_alphabet)
+					placed_on_letter_replacement:= TRUE
+				end
+				quadrant:= quadrant + 1
+			end
+			if not placed_on_letter_replacement then -- put at last available quadrant if no preceeding spots or '-'
+				grid[a_movable.r, a_movable.c].contents.force(movable_obj.entity_alphabet)
+				get_movable_quadrant(movable_obj, movable_obj.r, movable_obj.c) -- sets quadrant
+			end
+
+			movable_obj.set_id(shared_info.movables_id)
+			component.represents_movable_id(movable_obj.movable_id)
+			shared_info.movables_entity_list.force(component, shared_info.movables_entity_list.count + 1)
+			shared_info.shared_set_movables_id(shared_info.movables_id + 1)
+			shared_info.movables_list.force(movable_obj, shared_info.movables_list.count + 1) -- is this possible while were dealing with the list?
+			turn:= gen.rchoose(0,2)
+			movable_obj.set_turn(turn)
+
+		end
+
+		reproduce(a_movable: MOVABLE)
+			local
+				turn: INTEGER
+			do
+				if a_movable.entity_alphabet ~ create{ENTITY_ALPHABET}.make('M') or a_movable.entity_alphabet ~ create{ENTITY_ALPHABET}.make('B') or a_movable.entity_alphabet ~ create{ENTITY_ALPHABET}.make('J') then
+					if not grid[a_movable.r, a_movable.c].is_full and a_movable.actions_left_until_reproduction ~ 0 and a_movable.t ~ 0 then
+						clone_object(a_movable, a_movable.r, a_movable.c) -- this handles the turn value for new obj and also new id
+						-- turn:= gen.rchoose(0,2)
+						if a_movable.entity_alphabet ~ create{ENTITY_ALPHABET}.make('J') then
+							a_movable.set_actions_left_until_reproduction(2)
+						else
+							a_movable.set_actions_left_until_reproduction(1)
+						end
+					elseif a_movable.clone_when_quadrant_not_full and not grid[a_movable.r, a_movable.c].is_full then
+						clone_object(a_movable, a_movable.r, a_movable.c) -- this handles the turn value for new obj and also new id
+						-- turn:= gen.rchoose(0,2)
+						if a_movable.entity_alphabet ~ create{ENTITY_ALPHABET}.make('J') then
+							a_movable.set_actions_left_until_reproduction(2)
+						else
+							a_movable.set_actions_left_until_reproduction(1)
+						end
+						a_movable.set_clone_when_quadrant_not_full(false)
+					elseif grid[a_movable.r, a_movable.c].is_full and a_movable.actions_left_until_reproduction ~ 0 and a_movable.t ~ 0 then
+						a_movable.set_clone_when_quadrant_not_full(true)
+					elseif a_movable.actions_left_until_reproduction /~ 0 then
+						a_movable.set_actions_left_until_reproduction(a_movable.actions_left_until_reproduction - 1)
+					end
+				end
+			end
+
+
 
 
 feature -- query
@@ -712,6 +805,7 @@ feature -- query
 			Result:= FALSE
 			across grid[a_movable.r, a_movable.c].contents is entity loop
 				if entity ~ create{ENTITY_ALPHABET}.make('W') then
+					print("checking for wormhole and the row and column and entity are ")print(a_movable.r)print(a_movable.c)print(a_movable.entity_alphabet)
 					Result:= TRUE
 				end
 			end
