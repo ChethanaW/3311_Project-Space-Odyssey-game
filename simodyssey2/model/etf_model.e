@@ -361,7 +361,7 @@ feature -- model operations
 				--if wormhole present
 					cmd_name := "move" -- due to similar functionality same """update_status"""
 				--  explore randomly moves
-				g.wormhole_move(entity)
+				g.wormhole_move
 				--  planet moves just as if move command was entered
 				g.move_movables
 				end
