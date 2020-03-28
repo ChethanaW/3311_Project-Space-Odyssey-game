@@ -513,6 +513,7 @@ feature --commands
 
 						if movable_object.entity_alphabet /~ create{ENTITY_ALPHABET}.make('P') then -- planets don't have fuel
 							if movable_object.fuel < 1 then
+								--print("this is the movable that wil now get a turn avlue")print(movable_object.entity_alphabet)print(movable_object.movable_id)print("%N")
 								remove_dead(movable_object)
 							end
 						end
@@ -522,6 +523,7 @@ feature --commands
 						end
 
 						if not movable_object.is_dead then
+
 							reproduce(movable_object)
 							behave(movable_object)
 						end
@@ -949,15 +951,16 @@ feature -- query
 					if entity.entity_movable_id ~ movable_obj.movable_id then
 						movable_obj.set_new_quadrant (new_q)
 					end
-					if entity ~ create{ENTITY_ALPHABET}.make('Y') then
-						movable_obj.set_fuel(movable_obj.fuel + 2)
-						if movable_obj.fuel > movable_obj.max_fuel then
-							movable_obj.set_fuel(movable_obj.max_fuel)
-						end
-					end
-					if entity ~ create{ENTITY_ALPHABET}.make('*') then
+				end
+				if entity ~ create{ENTITY_ALPHABET}.make('Y') then
+					movable_obj.set_fuel(movable_obj.fuel + 2)
+					print("this is at yellow dwardf and has fuel ")print(movable_obj.entity_alphabet)print(movable_obj.movable_id)print(" with fuel ")print(movable_obj.fuel)
+					if movable_obj.fuel > movable_obj.max_fuel then
 						movable_obj.set_fuel(movable_obj.max_fuel)
 					end
+				end
+				if entity ~ create{ENTITY_ALPHABET}.make('*') then
+					movable_obj.set_fuel(movable_obj.max_fuel)
 				end
 				new_q := new_q + 1
 			end
