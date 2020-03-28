@@ -240,6 +240,9 @@ feature -- Queries
 				if not attached occupant  then
 					empty_space_found := TRUE
 				end
+				if occupant ~ create{ENTITY_ALPHABET}.make ('-') then
+					empty_space_found:= TRUE
+				end
 				loop_counter := loop_counter + 1
 			end
 

@@ -265,35 +265,37 @@ feature --commands
 				across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is value loop
 					if value ~ a_explorer then
 						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.go_i_th (pointer)
-
 						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.replace (letter_replacement)
 					end
 					pointer:= pointer + 1
 				end
 				shared_info.explorer.update_coord(temp_row, temp_col)
---				shared_info.explorer.set_prev_quadrant(2)
 				shared_info.explorer.set_quadrant(2)
 			else
 
-			if not grid[temp_row, temp_col].is_full then -- if there's an empty space or there's '-'
+			if not grid[temp_row, temp_col].is_full then
+				pointer:=1
+				across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is value loop
+					if value ~ a_explorer then
+						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.go_i_th (pointer)
+						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.replace (letter_replacement)
+					end
+					pointer:= pointer + 1
+				end
+
+				pointer:= 1
 				across grid[temp_row, temp_col].contents is entity loop
-					if entity ~ letter_replacement then
+					if entity ~ letter_replacement and not placed_on_letter_replacement then
 						shared_info.explorer.update_coord (temp_row, temp_col)
+						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.go_i_th(pointer)
 						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.put (a_explorer)
 						placed_on_letter_replacement := true
 					end
+					pointer:=pointer+1
 				end
 					if not placed_on_letter_replacement then
 						shared_info.explorer.update_coord (temp_row, temp_col)
 						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.force (a_explorer)
---						quadrant := 1
---						across grid[ex.exp_coordinates.row, ex.exp_coordinates.column].contents is entity
---						loop
---							if entity ~ create{ENTITY_ALPHABET}.make('E') then
---								ex.set_quadrant (quadrant)
---							end
---							quadrant := quadrant +1
---						end
 					end
 					quadrant := 1
 					shared_info.explorer.set_yellow_dwarf(false)
@@ -314,7 +316,7 @@ feature --commands
 				get_updated_fuel(shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column) -- print(ex.fuel)
 				-- shared_info.explorer.update_coord(ex.exp_coordinates.row, ex.exp_coordinates.column)
 				if shared_info.explorer.fuel < 1 then
-					grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.go_i_th (pointer)
+					grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.go_i_th (shared_info.explorer.quadrant)
 					grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.replace (letter_replacement)
 				end
 				Result := TRUE
@@ -327,7 +329,7 @@ feature --commands
 
 		--	ex.update_coord (temp_row, temp_col))
 
-			grid[last_coord.exp_coordinates.row,last_coord.exp_coordinates.column].contents.prune_all (a_explorer)
+		--	grid[last_coord.exp_coordinates.row,last_coord.exp_coordinates.column].contents.prune_all (a_explorer)
 
 --			grid[ex.exp_coordinates.row, ex.exp_coordinates.column].contents.force (a_explorer)
 --			ex.update_fuel(grid[ex.exp_coordinates.row, ex.exp_coordinates.column])
@@ -572,14 +574,14 @@ feature --commands
 
 
 			if not grid[temp_row, temp_col].is_full then -- if there's an empty space or there's '-'
-				print("this went through a wormhole ")print(a_movable.entity_alphabet)print(" ")print(a_movable.movable_id)
-				print("the row and column are ")print(a_movable.r)print(" ")print(a_movable.c)print("%N")
-				get_movable_quadrant(a_movable, a_movable.r, a_movable.c)
+				--print("this went through a wormhole ")print(a_movable.entity_alphabet)print(" ")print(a_movable.movable_id)
+				--print("the row and column are ")print(a_movable.r)print(" ")print(a_movable.c)print("%N")
+				get_movable_quadrant(a_movable, a_movable.r, a_movable.c)--print("the movables quadrant is ")print(a_movable.quadrant)
 				grid[a_movable.r, a_movable.c].contents.go_i_th (a_movable.quadrant)
 				grid[a_movable.r, a_movable.c].contents.replace (letter_replacement)
 
 				across grid[temp_row, temp_col].contents is entity loop
-					if entity ~ letter_replacement then
+					if entity ~ letter_replacement and not placed_on_letter_replacement then
 						grid[a_movable.r, a_movable.c].contents.put(a_movable.entity_alphabet)
 						placed_on_letter_replacement := true
 					end
