@@ -1,0 +1,7 @@
+play
+move(E)
+move(S)
+move(S)
+move(S)
+move(S)
+-- Description: Testing for reproduction and destroying
