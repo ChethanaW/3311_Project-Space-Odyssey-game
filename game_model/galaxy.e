@@ -382,34 +382,26 @@ feature --commands
 						grid[movable_obj.r, movable_obj.c].contents.replace(letter_replacement)
 						--print("THeobject entity aphabet is ")print(movable_obj.entity_alphabet)print("%N")
 
+						pointer:=1
 						across grid[temp_row, temp_column].contents is entity loop
 							if entity ~ letter_replacement and not placed_on_letter_replacement then
---								print("the value in the sector is  : ")print(entity)print("%N")print("the movable id is ")print(movable_obj.movable_id)print("%N")
---								across grid[temp_row, temp_column].contents is item  loop
---									print(item)print("%N")
---								end
---								print("placed on letter replacement ")print(movable_obj.entity_alphabet)print(movable_obj.movable_id)print("%N")
---								print("the size of scector should be 1 but it is : ")print(grid[temp_row, temp_column].contents.count)print("%N")
+								grid[temp_row, temp_column].contents.go_i_th(pointer)
 								grid[temp_row, temp_column].contents.put (movable_obj.entity_alphabet)
---								across grid[temp_row, temp_column].contents is item  loop
---									print(item)print("%N")
---								end
 								placed_on_letter_replacement := TRUE
 							end
+							pointer:=pointer+1
 						end
 						if not placed_on_letter_replacement then
 							grid[temp_row, temp_column].contents.force (movable_obj.entity_alphabet)
 						end
-						--print("the object entity alphabet after placing it is ")print(movable_obj.entity_alphabet)print("%N")
+						pointer:=1 -- might not be needed be initializing pointer in case something further uses it
 						movable_obj.entity_alphabet.represents_movable_id(movable_obj.movable_id)
 						movable_obj.set_prev_r_c(movable_obj.r,movable_obj.c)
 						movable_obj.set_entity_alphabet (movable_obj.entity_alphabet)
 						movable_obj.set_row (temp_row)
 						movable_obj.set_column (temp_column)
-						--print("after moving, the entity movable id is")print(movable_obj.entity_alphabet.entity_movable_id )print("%N")print("%N")
 						move_movable_list.force (movable_obj, movables_move_index)
 						movables_move_index := movables_move_index + 1
-						--print(" and move to row and column ")print(movable_obj.r)print(" ")print(movable_obj.c)print(" ")print(movable_obj.quadrant)print("%N")
 					end
 
 					if movable_obj.entity_alphabet ~ Create{ENTITY_ALPHABET}.make ('P') then
