@@ -353,6 +353,7 @@ feature --commands
 --			quadrant : INTEGER
 			pointer: INTEGER
 			qua: INTEGER
+			num: INTEGER
 
 		do
 			-- PLANET with turn 0 and no star
@@ -408,6 +409,16 @@ feature --commands
 						across grid[movable_obj.get_row, movable_obj.get_col].contents is val loop
 							if val.is_star then
 								movable_obj.star_value(True)
+								if val ~ create{ENTITY_ALPHABET}.make ('Y') then
+									movable_obj.has_yellow_dwarf (TRUE)
+									if movable_obj.yellow_dwarf = true and not movable_obj.has_checked_for_life then
+									num := gen.rchoose(1, 2) -- num=2 means life
+										if num = 2 then
+											movable_obj.support_life(true)  --%%%%%%%%%%%%%%%%%%%%%%%%%%%% stopped checking
+										end
+										movable_obj.set_check_flag(TRUE)
+									end
+								end
 							end
 						end
 					end
@@ -570,16 +581,29 @@ feature --commands
 			if not grid[temp_row, temp_col].is_full then -- if there's an empty space or there's '-'
 				--print("this went through a wormhole ")print(a_movable.entity_alphabet)print(" ")print(a_movable.movable_id)
 				--print("the row and column are ")print(a_movable.r)print(" ")print(a_movable.c)print("%N")
-				get_movable_quadrant(a_movable, a_movable.r, a_movable.c)--print("the movables quadrant is ")print(a_movable.quadrant)
+				get_movable_quadrant(a_movable, a_movable.r, a_movable.c)print("the movables quadrant is ")print(a_movable.quadrant)
 				grid[a_movable.r, a_movable.c].contents.go_i_th (a_movable.quadrant)
 				grid[a_movable.r, a_movable.c].contents.replace (letter_replacement)
 
+				across  grid[a_movable.r, a_movable.c].contents is entity loop
+					print(entity)print("%N")
+				end
+
 				across grid[temp_row, temp_col].contents is entity loop
 					if entity ~ letter_replacement and not placed_on_letter_replacement then
-						grid[a_movable.r, a_movable.c].contents.put(a_movable.entity_alphabet)
+						print(" being placed on a letter replacement ")print(a_movable.entity_alphabet)print(a_movable.movable_id)print("%N")
+						grid[temp_row, temp_col].contents.go_i_th(pointer)
+						print("pointer") print(pointer) print("%N")
+						grid[temp_row, temp_col].contents.put(a_movable.entity_alphabet)
 						placed_on_letter_replacement := true
 					end
+					pointer:=pointer+1
 				end
+
+				across  grid[temp_row, temp_col].contents is entity loop
+					print(entity)print("%N")
+				end
+
 				if not placed_on_letter_replacement then
 					grid[temp_row, temp_col].contents.force(a_movable.entity_alphabet)
 				end
@@ -667,7 +691,7 @@ feature --commands
 							end
 						quadrant := quadrant +1
 					end
-				-- get_updated_fuel(shared_info.explorer, shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column) -- print(ex.fuel)
+				get_updated_fuel(shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column) -- print(ex.fuel)
 			else
 
 				-- wormhole directed explorer to full sector... do
@@ -910,7 +934,11 @@ feature -- query
 					shared_info.explorer.update_fuel(3)
 					-- print("herererer")
 				elseif entity ~ create{ENTITY_ALPHABET}.make('Y') then
-					shared_info.explorer.update_fuel(3)
+					if shared_info.explorer.fuel ~ 0 then
+						shared_info.explorer.update_fuel(2)
+					else
+						shared_info.explorer.update_fuel(3)
+					end
 				end
 				if shared_info.explorer.fuel > 3 then
 					shared_info.explorer.update_fuel(3)

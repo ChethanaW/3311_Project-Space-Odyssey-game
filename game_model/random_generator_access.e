@@ -33,7 +33,7 @@ feature -- Query
 
             Result := gen.num\\(high-low + 1) + low
 
-            --print("RGN ")print(low) print(" ") print(high) print(" ") print(Result) print("%N")
+            print("RGN ")print(low) print(" ") print(high) print(" ") print(Result) print("%N")
 
             gen.forth
         end

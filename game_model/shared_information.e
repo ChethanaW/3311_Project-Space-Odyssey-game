@@ -178,10 +178,6 @@ feature --commands
 
 
 feature --queries
-
-
-
-
 	get_error_messages(error_num: INTEGER): STRING
 		do
 			create Result.make_empty

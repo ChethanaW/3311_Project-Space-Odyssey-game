@@ -48,7 +48,7 @@ feature {NONE} -- Initialization
 
 			--other
          --	create explorer.make
-         	create planet.make
+         	--create planet.make
          	create g.dummy_galaxy_make
          	info := sa.shared_info
 
@@ -83,7 +83,7 @@ feature -- model attributes
 	g : GALAXY -- has access to shared information
  	info : SHARED_INFORMATION
 	-- explorer : EXPLORER
-    planet: PLANET
+    --planet: PLANET
 
 
 
@@ -135,6 +135,8 @@ feature -- model operations
 		do
 			cmd_name:="land"
 			error:= FALSE
+
+
 
 			if mode ~ "abort" or mode ~ "start" then
 				error:= TRUE
@@ -218,7 +220,9 @@ feature -- model operations
 			else
 				-- things to do if move is used at a valid time
 				entity_movement:= TRUE -- bcs almost all movables move
+				info.explorer.set_has_planets(FALSE)
 				exp_move_status:= info.explorer.move_expl (a_dir, g)
+
 				if exp_move_status ~ FALSE then
 					error:= TRUE
 					error_message:= info.get_error_messages (8)
@@ -415,6 +419,12 @@ feature -- queries
 			Result.append (i.out)
 			Result.append (".")
 			Result.append (j.out)
+
+			--------------remove later **************************
+			Result.append("has fuel")
+			Result.append_integer_64(info.explorer.fuel)
+
+			------------------------
 
 			if cmd_name ~ "none" then
 				Result.append (", ok")
