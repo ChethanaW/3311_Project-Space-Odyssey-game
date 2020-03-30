@@ -63,8 +63,16 @@ feature -- common features
 
 	clone_when_quadrant_not_full: BOOLEAN
 
+	is_reproduced: BOOLEAN
+
 
 feature -- commands
+
+	set_is_reproduced(value: BOOLEAN)
+		do
+			is_reproduced:= value
+		end
+
 
 	set_fuel(value: INTEGER)
 		do
@@ -251,25 +259,25 @@ feature --queries
 				else
 					Result.append("N/A")
 				end
+			elseif entity_alphabet.item ~ 'A' then
+				Result.append("]->turn_left:")
+				Result.append_integer_64(t)
+			elseif entity_alphabet.item ~ 'J' then
+				Result.append("]->fuel:")
+				Result.append_integer_64(fuel)
+				Result.append("/5, load:")
+				Result.append_integer_64(load)
+				Result.append("/2, actions_left_until_reproduction:")
+				Result.append_integer_64(actions_left_until_reproduction)
+				Result.append("/2, turns_left:")
+				Result.append_integer_64(t)
 			else
-				Result.append("]->fuel?:")
-				if supports_life ~ False then
-					Result.append("F, ")
-				else
-				 	Result.append("T, ")
-				end
-				Result.append("action_left_until_reproduction?:")
-				if visited ~ False then
-					Result.append("F, ")
-				else
-					Result.append("T, ")
-				end
-				Result.append("turns_left:")
-				if star_val ~ False then
-					Result.append_integer_64(t)
-				else
-					Result.append("N/A")
-				end
+				Result.append("]->fuel:")
+				Result.append_integer_64(fuel)
+				Result.append("/3, actions_left_until_reproduction:")
+				Result.append_integer_64(actions_left_until_reproduction)
+				Result.append("/1, turns_left:")
+				Result.append_integer_64(t)
 			end
 
 

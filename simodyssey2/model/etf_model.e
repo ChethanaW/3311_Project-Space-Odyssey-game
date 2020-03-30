@@ -157,13 +157,16 @@ feature -- model operations
 				-- things to do if land is used at a valid time
 				-- trying_to_land := 1
 				--if g.landed_planet = true then
+				g.visit_planet
 				if info.planet_supports_life then
 					land_flag := 1
+
+
 				end
 
 
 				--end
-				g.visit_planet
+
 			--	g.ex.update_landed_status(TRUE)
 				info.set_skip_explorer_coordinates(TRUE)
 				info.explorer.update_landed_status (TRUE)  -------###### double check if this is correct the case if no life we still land or not
@@ -192,6 +195,7 @@ feature -- model operations
 					entity_movement:=TRUE
 					g.move_movables
 					info.explorer.update_landed_status (false) -- lifting off, not landed anymore
+					land_flag := 0
 				else
 					error:=TRUE
 					cmd_name:="wormhole" -- display purposes
@@ -396,7 +400,7 @@ feature -- model operations
 					j:=0
 				end
 			else
-				if cmd_name ~ "move" or cmd_name ~ "pass" or ( cmd_name ~ mode and play_check ~1 ) then
+				if cmd_name ~ "move" or cmd_name ~ "pass" or ( cmd_name ~ mode and play_check ~1 ) or (cmd_name ~ "land" and error ~ FALSE) or (cmd_name ~ "liftoff" and error ~ FALSE) then
 					i:= i+1
 					j:= 0
 				else
@@ -421,8 +425,8 @@ feature -- queries
 			Result.append (j.out)
 
 			--------------remove later **************************
-			Result.append("has fuel")
-			Result.append_integer_64(info.explorer.fuel)
+--			Result.append("has fuel")
+--			Result.append_integer_64(info.explorer.fuel)
 
 			------------------------
 
@@ -527,6 +531,8 @@ feature -- queries
 						elseif cmd_name ~ "land" then
 							if land_flag ~ 1 then--if life was found on the planet
 								Result.append ("Tranquility base here - we've got a life!")
+								mode := "abort"
+
 							else-- if life is not found
 								Result.append ("Explorer found no life as we know it at Sector:")
 								Result.append_integer_64(info.explorer.exp_coordinates.row)
@@ -537,26 +543,35 @@ feature -- queries
 							end
 						end
 
-						if cmd_name ~ "play" or cmd_name ~ "test" then
-							Result.append("Movement:none")
-						else
-							Result.append("Movement:")
-							Result.append("%N")
-							Result.append(g.out_movement)
+						if land_flag ~ 0  then
+							if cmd_name ~ "play" or cmd_name ~ "test"  then
+								Result.append("Movement:none")
+							else
+								Result.append("Movement:")
+								if cmd_name /~ "pass" then
+									Result.append("%N")
+								end
+
+								Result.append(g.out_movement)
+							end
+
+							if mode ~ "test" then
+								Result.append (g.sector_out)
+								Result.append (g.description_out)
+								Result.append ("%N")
+								Result.append ("  Deaths This Turn:")
+								Result.append (info.explorer.death_message)
+							end
+
+							Result.append(g.out)
 						end
 
-						if mode ~ "test" then
-							Result.append (g.sector_out)
-							Result.append (g.description_out)
-							Result.append ("%N")
-							Result.append ("  Deaths This Turn:")
-							Result.append (info.explorer.death_message)
-						end
 
-						Result.append(g.out)
+
 					end
 				end -- if for error check
 			end -- if for start check
+			info.set_skip_explorer_coordinates (false)
 
 		end
 

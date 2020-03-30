@@ -1,5 +1,6 @@
 --Tests winning condition in play mode.
-play
+--play
+test(3,5,7,15,30)
 pass
 pass
 pass

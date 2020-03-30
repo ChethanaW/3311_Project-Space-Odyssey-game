@@ -403,6 +403,13 @@ feature --commands
 						movable_obj.set_column (temp_column)
 						move_movable_list.force (movable_obj, movables_move_index)
 						movables_move_index := movables_move_index + 1
+					else -- else if it's full
+						movable_obj.set_prev_r_c(movable_obj.r,movable_obj.c)
+						movable_obj.set_entity_alphabet (movable_obj.entity_alphabet)
+						movable_obj.set_row (movable_obj.r)
+						movable_obj.set_column (movable_obj.c)
+						move_movable_list.force (movable_obj, movables_move_index)
+						movables_move_index := movables_move_index + 1
 					end
 
 					if movable_obj.entity_alphabet ~ Create{ENTITY_ALPHABET}.make ('P') then
@@ -414,7 +421,7 @@ feature --commands
 									if movable_obj.yellow_dwarf = true and not movable_obj.has_checked_for_life then
 									num := gen.rchoose(1, 2) -- num=2 means life
 										if num = 2 then
-											movable_obj.support_life(true)  --%%%%%%%%%%%%%%%%%%%%%%%%%%%% stopped checking
+											movable_obj.support_life(true)
 										end
 										movable_obj.set_check_flag(TRUE)
 									end
@@ -422,6 +429,7 @@ feature --commands
 							end
 						end
 					end
+
 
 					if movable_obj.entity_alphabet ~ create{ENTITY_ALPHABET}.make('M') or movable_obj.entity_alphabet ~ create{ENTITY_ALPHABET}.make('B') or movable_obj.entity_alphabet ~ create{ENTITY_ALPHABET}.make('J') then
 						movable_obj.set_fuel(movable_obj.fuel - 1)
@@ -455,12 +463,20 @@ feature --commands
 			end
 
 		remove_dead_given_entity_alphabet(a_entity: ENTITY_ALPHABET)
+			local
+				pointer: INTEGER
 			do
+				pointer:= 1
 				across shared_info.movables_list is obj loop
 					if obj.movable_id ~ a_entity.entity_movable_id then
 						obj.set_is_dead(true)
-						grid[obj.r, obj.c].contents.go_i_th(obj.new_quadrant) -- make sure this value is right
-						grid[obj.r, obj.c].contents.replace(letter_replacement)
+						across grid[obj.r, obj.c].contents is entity loop
+							if entity.entity_movable_id ~ obj.movable_id then
+								grid[obj.r, obj.c].contents.go_i_th(pointer)
+								grid[obj.r, obj.c].contents.replace(letter_replacement)
+							end
+							pointer:= pointer+1
+						end
 					end
 				end
 			end
@@ -522,7 +538,7 @@ feature --commands
 						get_movable_new_quadrant(movable_object, movable_object.r, movable_object.c) -- this also updates the fuel
 
 
-						if movable_object.entity_alphabet /~ create{ENTITY_ALPHABET}.make('P') then -- planets don't have fuel
+						if movable_object.entity_alphabet ~ create{ENTITY_ALPHABET}.make('B') or movable_object.entity_alphabet ~ create{ENTITY_ALPHABET}.make('M') or movable_object.entity_alphabet ~ create{ENTITY_ALPHABET}.make('J') then -- planets don't have fuel
 							if movable_object.fuel < 1 then
 								--print("this is the movable that wil now get a turn avlue")print(movable_object.entity_alphabet)print(movable_object.movable_id)print("%N")
 								remove_dead(movable_object)
@@ -581,28 +597,28 @@ feature --commands
 			if not grid[temp_row, temp_col].is_full then -- if there's an empty space or there's '-'
 				--print("this went through a wormhole ")print(a_movable.entity_alphabet)print(" ")print(a_movable.movable_id)
 				--print("the row and column are ")print(a_movable.r)print(" ")print(a_movable.c)print("%N")
-				get_movable_quadrant(a_movable, a_movable.r, a_movable.c)print("the movables quadrant is ")print(a_movable.quadrant)
+				get_movable_quadrant(a_movable, a_movable.r, a_movable.c)--print("the movables quadrant is ")print(a_movable.quadrant)
 				grid[a_movable.r, a_movable.c].contents.go_i_th (a_movable.quadrant)
 				grid[a_movable.r, a_movable.c].contents.replace (letter_replacement)
 
-				across  grid[a_movable.r, a_movable.c].contents is entity loop
-					print(entity)print("%N")
-				end
+--				across  grid[a_movable.r, a_movable.c].contents is entity loop
+--					print(entity)print("%N")
+--				end
 
 				across grid[temp_row, temp_col].contents is entity loop
 					if entity ~ letter_replacement and not placed_on_letter_replacement then
-						print(" being placed on a letter replacement ")print(a_movable.entity_alphabet)print(a_movable.movable_id)print("%N")
+						--print(" being placed on a letter replacement ")print(a_movable.entity_alphabet)print(a_movable.movable_id)print("%N")
 						grid[temp_row, temp_col].contents.go_i_th(pointer)
-						print("pointer") print(pointer) print("%N")
+						--print("pointer") print(pointer) print("%N")
 						grid[temp_row, temp_col].contents.put(a_movable.entity_alphabet)
 						placed_on_letter_replacement := true
 					end
 					pointer:=pointer+1
 				end
 
-				across  grid[temp_row, temp_col].contents is entity loop
-					print(entity)print("%N")
-				end
+--				across  grid[temp_row, temp_col].contents is entity loop
+--					print(entity)print("%N")
+--				end
 
 				if not placed_on_letter_replacement then
 					grid[temp_row, temp_col].contents.force(a_movable.entity_alphabet)
@@ -673,7 +689,7 @@ feature --commands
 				grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.replace(letter_replacement)
 
 				across grid[temp_row, temp_col].contents is entity loop
-					if entity ~ letter_replacement then
+					if entity ~ letter_replacement and not placed_on_letter_replacement then
 						shared_info.explorer.update_coord (temp_row, temp_col)
 						grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.put (shared_info.explorer.letter)
 						placed_on_letter_replacement := true
@@ -757,8 +773,9 @@ feature --commands
 			movable_obj.set_entity_alphabet(component)
 
 			across grid[a_movable.r, a_movable.c].contents is entity loop
-				if entity ~ create{ENTITY_ALPHABET}.make('-') then
+				if entity ~ create{ENTITY_ALPHABET}.make('-') and not placed_on_letter_replacement then
 					movable_obj.set_quadrant(quadrant)
+					grid[a_movable.r, a_movable.c].contents.go_i_th(quadrant)
 					grid[a_movable.r, a_movable.c].contents.put(movable_obj.entity_alphabet)
 					placed_on_letter_replacement:= TRUE
 				end
@@ -776,6 +793,7 @@ feature --commands
 			shared_info.movables_list.force(movable_obj, shared_info.movables_list.count + 1) -- is this possible while were dealing with the list?
 			turn:= gen.rchoose(0,2)
 			movable_obj.set_turn(turn)
+			movable_obj.set_is_reproduced(TRUE)
 
 		end
 
@@ -783,16 +801,19 @@ feature --commands
 			local
 				turn: INTEGER
 			do
+				--print("entity and id and actions")print(a_movable.entity_alphabet)print(a_movable.movable_id)print(a_movable.actions_left_until_reproduction)print("%N")
 				if a_movable.entity_alphabet ~ create{ENTITY_ALPHABET}.make('M') or a_movable.entity_alphabet ~ create{ENTITY_ALPHABET}.make('B') or a_movable.entity_alphabet ~ create{ENTITY_ALPHABET}.make('J') then
 					if not grid[a_movable.r, a_movable.c].is_full and a_movable.actions_left_until_reproduction ~ 0 and a_movable.t ~ 0 then
 						clone_object(a_movable, a_movable.r, a_movable.c) -- this handles the turn value for new obj and also new id
+
 						-- turn:= gen.rchoose(0,2)
 						if a_movable.entity_alphabet ~ create{ENTITY_ALPHABET}.make('J') then
 							a_movable.set_actions_left_until_reproduction(2)
 						else
 							a_movable.set_actions_left_until_reproduction(1)
 						end
-					elseif a_movable.clone_when_quadrant_not_full and not grid[a_movable.r, a_movable.c].is_full then
+					elseif a_movable.clone_when_quadrant_not_full and not grid[a_movable.r, a_movable.c].is_full and a_movable.actions_left_until_reproduction ~ 0 then
+						--print("4b in here")
 						clone_object(a_movable, a_movable.r, a_movable.c) -- this handles the turn value for new obj and also new id
 						-- turn:= gen.rchoose(0,2)
 						if a_movable.entity_alphabet ~ create{ENTITY_ALPHABET}.make('J') then
@@ -804,7 +825,9 @@ feature --commands
 					elseif grid[a_movable.r, a_movable.c].is_full and a_movable.actions_left_until_reproduction ~ 0 and a_movable.t ~ 0 then
 						a_movable.set_clone_when_quadrant_not_full(true)
 					elseif a_movable.actions_left_until_reproduction /~ 0 then
+
 						a_movable.set_actions_left_until_reproduction(a_movable.actions_left_until_reproduction - 1)
+						--print("entity and id")print(a_movable.entity_alphabet)print(a_movable.movable_id)print("%N")
 					end
 				end
 			end
@@ -829,11 +852,12 @@ feature --commands
 						if item ~ m or item ~ b or item ~ j then
 							remove_dead_given_entity_alphabet(item)
 						end
-						if item ~ e then
+						if item ~ e and not shared_info.explorer.landed then
 							shared_info.explorer.set_is_dead(TRUE)
 						end
 					end
 					a_movable.set_turn(gen.rchoose(0,2))
+					--print("asteroid updating turn vaalue")
 				elseif a_movable.entity_alphabet ~ j then
 					across grid[a_movable.r, a_movable.c].contents is item loop
 						if item ~ a and a_movable.load < 2 then
@@ -982,7 +1006,7 @@ feature -- query
 				end
 				if entity ~ create{ENTITY_ALPHABET}.make('Y') then
 					movable_obj.set_fuel(movable_obj.fuel + 2)
-					print("this is at yellow dwardf and has fuel ")print(movable_obj.entity_alphabet)print(movable_obj.movable_id)print(" with fuel ")print(movable_obj.fuel)
+					--print("this is at yellow dwardf and has fuel ")print(movable_obj.entity_alphabet)print(movable_obj.movable_id)print(" with fuel ")print(movable_obj.fuel)
 					if movable_obj.fuel > movable_obj.max_fuel then
 						movable_obj.set_fuel(movable_obj.max_fuel)
 					end
@@ -1041,6 +1065,8 @@ feature -- query
 --				Result.append ("  ")
 --				Result.append ("  ")
 				--Result.append ("%N")
+			else
+				--Result.append("check")
 			end
 			-- shared_info.set_skip_explorer_coordinates(FALSE)
 

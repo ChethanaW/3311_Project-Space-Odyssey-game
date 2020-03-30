@@ -22,6 +22,7 @@ feature {NONE} -- Initialization
 			create entity_alphabet.make('A')
 			create sector_out_info.make_empty
 			create death_message.make_empty
+			actions_left_until_reproduction := 1
 		end
 
 feature -- Access
