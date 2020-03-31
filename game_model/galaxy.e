@@ -278,8 +278,10 @@ feature --commands
 					pointer:= pointer + 1
 				end
 				shared_info.explorer.update_coord(temp_row, temp_col)
+				shared_info.explorer.update_life(0)
+				shared_info.explorer.update_fuel(shared_info.explorer.fuel -1)
 				--added to explorer movable to add to the list
-							death_msg:= shared_info.get_death_message ('E', 0 , 3, -1 , 3, 3)
+							death_msg:= shared_info.get_death_message ('E', 0 , 2, -1 , 3, 3)
 							exp_obj.set_entity_alphabet(create {ENTITY_ALPHABET}.make ('E'))
 							exp_obj.set_row(temp_row)
 							exp_obj.set_column(temp_col)
@@ -338,8 +340,9 @@ feature --commands
 				if shared_info.explorer.fuel < 1 then
 					if fuel_check then
 							shared_info.explorer.set_is_dead(true)
+							shared_info.explorer.update_life (0)
 					--added
-							death_msg:= shared_info.get_death_message ('E', 0 , 3, -1 , shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column)
+							death_msg:= shared_info.get_death_message ('E', 0 , 1, -1 , shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column)
 							exp_obj.set_entity_alphabet(create {ENTITY_ALPHABET}.make ('E'))
 							exp_obj.set_row(temp_row)
 							exp_obj.set_column(temp_col)
@@ -741,9 +744,10 @@ feature --commands
 					pointer:= pointer + 1
 				end
 				shared_info.explorer.update_coord(temp_row, temp_col)
-
+				shared_info.explorer.update_life(0)
+				--shared_info.explorer.update_fuel(shared_info.explorer.fuel -1)
 				--added to explorer movable to add to the list
-							death_msg:= shared_info.get_death_message ('E', 0 , 3, -1 , 3, 3)
+							death_msg:= shared_info.get_death_message ('E', 0 , 2, -1 , 3, 3)
 							exp_obj.set_entity_alphabet(create {ENTITY_ALPHABET}.make ('E'))
 							exp_obj.set_row(temp_row)
 							exp_obj.set_column(temp_col)
@@ -779,7 +783,26 @@ feature --commands
 							end
 						quadrant := quadrant +1
 					end
-				get_updated_fuel(shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column) -- print(ex.fuel)
+
+				across grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents is entity loop
+					if entity ~ create{ENTITY_ALPHABET}.make('*') then
+						shared_info.explorer.update_fuel(3)
+						-- print("herererer")
+					elseif entity ~ create{ENTITY_ALPHABET}.make('Y') then
+						if shared_info.explorer.fuel ~ 0 then
+							shared_info.explorer.update_fuel(2)
+						else
+							shared_info.explorer.update_fuel(3)
+						end
+					end
+					if shared_info.explorer.fuel > 3 then
+						shared_info.explorer.update_fuel(3)
+					end
+				end
+				if shared_info.explorer.fuel < 1 then
+					fuel_check := true
+				end
+
 			else
 
 				-- wormhole directed explorer to full sector... do
@@ -937,7 +960,7 @@ feature --commands
 						end
 						if item ~ e and not shared_info.explorer.landed then
 							shared_info.explorer.set_is_dead(TRUE)
-
+							shared_info.explorer.update_life(0)
 							--added
 							death_msg:= shared_info.get_death_message (item.item, 0 , 3, a_movable.movable_id , a_movable.r, a_movable.c)
 							exp_obj.set_entity_alphabet(create {ENTITY_ALPHABET}.make ('E'))
@@ -979,6 +1002,7 @@ feature --commands
 						shared_info.explorer.update_life(shared_info.explorer.life - 1) -- explorer dies if life is at 0
 						if shared_info.explorer.life < 1 then
 							shared_info.explorer.set_is_dead(TRUE)
+							shared_info.explorer.update_life(0)
 							--added
 							death_msg:= shared_info.get_death_message ('E', m.entity_movable_id , 4, a_movable.movable_id , a_movable.r, a_movable.c)
 							exp_obj.set_entity_alphabet(create {ENTITY_ALPHABET}.make ('E'))
@@ -1059,6 +1083,7 @@ feature -- query
 
 	get_updated_fuel(row: INTEGER; col: INTEGER)
 		do
+
 			shared_info.explorer.update_fuel(shared_info.explorer.fuel - 1)
 			across grid[row, col].contents is entity loop
 				if entity ~ create{ENTITY_ALPHABET}.make('*') then
@@ -1232,7 +1257,7 @@ feature -- query
 							Result.append (",")
 							Result.append_integer_64 (movable.quadrant)
 							Result.append ("]")
-							if movable.prev_r /~ movable.r and movable.prev_c /~ movable.c and movable.quadrant/~movable.new_quadrant then
+							if (movable.prev_r /~ movable.r or movable.prev_c /~ movable.c or movable.quadrant/~movable.new_quadrant) then
 								Result.append("->[")
 								Result.append_integer_64 (movable.r)
 								Result.append (",")
