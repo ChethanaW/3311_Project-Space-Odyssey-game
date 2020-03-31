@@ -158,6 +158,6 @@ feature -- Query
 
 invariant
     allowable_symbols:
-    	item = 'E' or item = 'P' or item = 'A' or item = 'M' or  item = 'J' or item = 'O' or item = 'W' or item = 'Y' or item = '*' or item='B'  or item = '-'
+    	item = 'E' or item = 'P' or item = 'A' or item = 'M' or  item = 'J' or item = 'O' or item = 'W' or item = 'Y' or item = '*' or item='B'  or item = '-' or item ='X'
 
 end

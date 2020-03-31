@@ -1,0 +1,11 @@
+test(3,5,7,15,30)
+move(S)
+move(E)
+move(NW)
+abort
+test(3,5,7,15,30)
+move(SE)
+status
+move(SE)
+status
+move(S)

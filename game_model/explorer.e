@@ -7,6 +7,18 @@ note
 class
 	EXPLORER
 
+--	inherit
+--		MOVABLE
+
+--		redefine
+--			is_dead,has_yellow_dwarf, letter,
+--			quadrant,prev_quadrant,fuel,landed,
+--			Max_fuel,sector_out_info,death_message,
+--			set_quadrant,set_prev_quadrant,
+--			set_is_dead,get_description
+
+--		end
+
 create
 	make
 
@@ -66,17 +78,17 @@ feature -- model attributes
 feature -- Command
 
 
-	update_coord(r: INTEGER; c: INTEGER)
+	update_coord(l_r: INTEGER; l_c: INTEGER)
 		do
-			exp_coordinates.row := r
-			exp_coordinates.column := c
+			exp_coordinates.row := l_r
+			exp_coordinates.column := l_c
 		--	exp_coordinates.quadrant := q
 		end
-	set_prev_coord(r: INTEGER; c: INTEGER)
+	set_prev_coord(l_r: INTEGER; l_c: INTEGER)
 		do
 
-			exp_prev_coordinates.row := r
-			exp_prev_coordinates.column := c
+			exp_prev_coordinates.row := l_r
+			exp_prev_coordinates.column := l_c
 		end
 
 	set_quadrant(qua: INTEGER)

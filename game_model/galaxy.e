@@ -56,6 +56,8 @@ feature -- attributes
 	letter_for_movable : ENTITY_ALPHABET
 	move_movable_list : ARRAY[MOVABLE]
 	movables_move_index: INTEGER
+	movable_dead_list: ARRAY[MOVABLE]
+	movable_dead_list_index :INTEGER
 
 
 
@@ -107,6 +109,7 @@ feature --constructor
 			-- for movables
 			create letter_for_movable.make('B')
 			create move_movable_list.make_empty
+			create movable_dead_list.make_empty
 			movables_move_index :=0
 
 
@@ -130,6 +133,7 @@ feature -- constructor
 
 			create letter_for_movable.make('B')
 			create move_movable_list.make_empty
+			create movable_dead_list.make_empty
 
 		end
 
@@ -226,7 +230,11 @@ feature --commands
 			placed_on_letter_replacement : BOOLEAN
 			pointer : INTEGER
 			quadrant: INTEGER
+			death_msg: STRING
+			exp_obj: EXPLORER_MOVABLE
 		do
+			create death_msg.make_empty
+			create exp_obj.make
 			placed_on_letter_replacement := false
 			pointer := 1
 
@@ -270,6 +278,17 @@ feature --commands
 					pointer:= pointer + 1
 				end
 				shared_info.explorer.update_coord(temp_row, temp_col)
+				--added to explorer movable to add to the list
+							death_msg:= shared_info.get_death_message ('E', 0 , 3, -1 , 3, 3)
+							exp_obj.set_entity_alphabet(create {ENTITY_ALPHABET}.make ('E'))
+							exp_obj.set_row(temp_row)
+							exp_obj.set_column(temp_col)
+							exp_obj.set_is_dead(TRUE)
+							exp_obj.set_death_message(death_msg)
+							exp_obj.set_killer_id(-1)
+							exp_obj.set_new_quadrant(2)
+							movable_dead_list.force (exp_obj, movable_dead_list_index)
+							movable_dead_list_index := movable_dead_list_index + 1
 				shared_info.explorer.set_quadrant(2)
 			else
 
@@ -304,6 +323,7 @@ feature --commands
 						loop
 							if entity ~ create{ENTITY_ALPHABET}.make('E') then
 								shared_info.explorer.set_quadrant (quadrant)
+								exp_obj.set_new_quadrant(quadrant)
 							end
 							if entity ~ create{ENTITY_ALPHABET}.make('Y') then
 								shared_info.explorer.set_yellow_dwarf(true)
@@ -316,6 +336,19 @@ feature --commands
 				get_updated_fuel(shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column) -- print(ex.fuel)
 				-- shared_info.explorer.update_coord(ex.exp_coordinates.row, ex.exp_coordinates.column)
 				if shared_info.explorer.fuel < 1 then
+					if fuel_check then
+							shared_info.explorer.set_is_dead(true)
+					--added
+							death_msg:= shared_info.get_death_message ('E', 0 , 3, -1 , shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column)
+							exp_obj.set_entity_alphabet(create {ENTITY_ALPHABET}.make ('E'))
+							exp_obj.set_row(temp_row)
+							exp_obj.set_column(temp_col)
+							exp_obj.set_is_dead(TRUE)
+							exp_obj.set_death_message(death_msg)
+							exp_obj.set_killer_id(-2)
+							movable_dead_list.force (exp_obj, movable_dead_list_index)
+							movable_dead_list_index := movable_dead_list_index + 1
+					end
 					grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.go_i_th (shared_info.explorer.quadrant)
 					grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.replace (letter_replacement)
 				end
@@ -439,13 +472,17 @@ feature --commands
 
 		end
 
-		remove_dead(movable_obj: MOVABLE)
+		remove_dead(movable_obj: MOVABLE ; death_message:STRING; killer_id:INTEGER)
 			local
 				pointer: INTEGER
 			do
 				pointer:=1
 				movable_obj.set_is_dead(true) -- --when dead, replace movable_obj.entity_alphabet with a '-'
 							--movable_obj.set_entity_alphabet(letter_replacement)
+
+--				move_movable_list.force (movable_obj, movables_move_index)
+--				movables_move_index := movables_move_index + 1
+
 				across grid[movable_obj.r, movable_obj.c].contents is value loop
 					if value ~ movable_obj.entity_alphabet and value.entity_movable_id ~ movable_obj.movable_id then
 						grid[movable_obj.r, movable_obj.c].contents.go_i_th (pointer)
@@ -454,15 +491,21 @@ feature --commands
 					pointer:= pointer + 1
 				end
 
-				across shared_info.movables_list is move loop
-					if move.movable_id ~ movable_obj.movable_id then
+
+				across shared_info.movables_list is obj loop
+					if obj.movable_id ~ movable_obj.movable_id then
+						obj.set_is_dead(true)
+						obj.set_death_message(death_message)
+						obj.set_killer_id(killer_id)
+						movable_dead_list.force (obj, movable_dead_list_index)
+						movable_dead_list_index := movable_dead_list_index + 1
 					--	shared_info.movables_list.prune_all(movable_obj) -- caused program to break... how to deal with dead?
 					end
 				end
 
 			end
 
-		remove_dead_given_entity_alphabet(a_entity: ENTITY_ALPHABET)
+		remove_dead_given_entity_alphabet(a_entity: ENTITY_ALPHABET; death_message: STRING; killer_id:INTEGER)
 			local
 				pointer: INTEGER
 			do
@@ -470,6 +513,10 @@ feature --commands
 				across shared_info.movables_list is obj loop
 					if obj.movable_id ~ a_entity.entity_movable_id then
 						obj.set_is_dead(true)
+						obj.set_death_message(death_message)
+						obj.set_killer_id(killer_id)
+						movable_dead_list.force (obj, movable_dead_list_index)
+						movable_dead_list_index := movable_dead_list_index + 1
 						across grid[obj.r, obj.c].contents is entity loop
 							if entity.entity_movable_id ~ obj.movable_id then
 								grid[obj.r, obj.c].contents.go_i_th(pointer)
@@ -494,9 +541,11 @@ feature --commands
 			yellow_dwarf: INTEGER -- I think this need to change INTEGER into YELLOW_DWARF %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			num: INTEGER
 			new_q: INTEGER
+			death_msg:STRING
 
 		do
 			create temp.make_empty
+			create death_msg.make_empty
 			temp.compare_objects
 			yellow_dwarf := 0
 
@@ -541,12 +590,19 @@ feature --commands
 						if movable_object.entity_alphabet ~ create{ENTITY_ALPHABET}.make('B') or movable_object.entity_alphabet ~ create{ENTITY_ALPHABET}.make('M') or movable_object.entity_alphabet ~ create{ENTITY_ALPHABET}.make('J') then -- planets don't have fuel
 							if movable_object.fuel < 1 then
 								--print("this is the movable that wil now get a turn avlue")print(movable_object.entity_alphabet)print(movable_object.movable_id)print("%N")
-								remove_dead(movable_object)
+								death_msg:= shared_info.get_death_message (movable_object.entity_alphabet.item, movable_object.movable_id , 1, -2 , movable_object.r, movable_object.c)
+								remove_dead(movable_object,death_msg, -2)
 							end
 						end
 
 						if movable_object.r ~ 3 and movable_object.c ~ 3 then
-							remove_dead(movable_object)
+							if movable_object.entity_alphabet.item ~  'P' then
+								death_msg:= shared_info.get_death_message (movable_object.entity_alphabet.item, movable_object.movable_id , 7, -1 , 3, 3)
+								remove_dead(movable_object,death_msg, -1)
+							else
+								death_msg:= shared_info.get_death_message (movable_object.entity_alphabet.item, movable_object.movable_id , 2, -1 , 3, 3)
+								remove_dead(movable_object,death_msg, -1)
+							end
 						end
 
 						if not movable_object.is_dead then
@@ -636,6 +692,7 @@ feature --commands
 			else
 
 				-- wormhole directed explorer to full sector... do... edge case
+				movable_wormhole_move(a_movable)
 			end
 
 	end
@@ -650,7 +707,11 @@ feature --commands
 			pointer : INTEGER
 			quadrant: INTEGER
 			worm_exists: BOOLEAN
+			death_msg:STRING
+			exp_obj:EXPLORER_MOVABLE
 		do
+			create death_msg.make_empty
+			create exp_obj.make
 			placed_on_letter_replacement := false
 			pointer := 1
 
@@ -680,7 +741,18 @@ feature --commands
 					pointer:= pointer + 1
 				end
 				shared_info.explorer.update_coord(temp_row, temp_col)
---				shared_info.explorer.set_prev_quadrant(2)
+
+				--added to explorer movable to add to the list
+							death_msg:= shared_info.get_death_message ('E', 0 , 3, -1 , 3, 3)
+							exp_obj.set_entity_alphabet(create {ENTITY_ALPHABET}.make ('E'))
+							exp_obj.set_row(temp_row)
+							exp_obj.set_column(temp_col)
+							exp_obj.set_is_dead(TRUE)
+							exp_obj.set_death_message(death_msg)
+							exp_obj.set_killer_id(0)
+							exp_obj.set_new_quadrant(2)
+							movable_dead_list.force (exp_obj, movable_dead_list_index)
+							movable_dead_list_index := movable_dead_list_index + 1
 				shared_info.explorer.set_quadrant(2)
 			else
 
@@ -778,6 +850,7 @@ feature --commands
 					grid[a_movable.r, a_movable.c].contents.go_i_th(quadrant)
 					grid[a_movable.r, a_movable.c].contents.put(movable_obj.entity_alphabet)
 					placed_on_letter_replacement:= TRUE
+					--movable_obj.set_new_quadrant (quadrant) -- MAJOR CHNAGE %%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&
 				end
 				quadrant:= quadrant + 1
 			end
@@ -794,6 +867,11 @@ feature --commands
 			turn:= gen.rchoose(0,2)
 			movable_obj.set_turn(turn)
 			movable_obj.set_is_reproduced(TRUE)
+
+			get_movable_new_quadrant(movable_obj, movable_obj.r, movable_obj.c) -- MAJOR CHNAGE %%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&
+			--print("quadrant ")print(movable_obj.new_quadrant) print("%N")
+			move_movable_list.force (movable_obj, movables_move_index)
+			movables_move_index := movables_move_index + 1
 
 		end
 
@@ -840,20 +918,36 @@ feature --commands
 				j: ENTITY_ALPHABET
 				e: ENTITY_ALPHABET
 				a: ENTITY_ALPHABET
+				death_msg: STRING
+				exp_obj: EXPLORER_MOVABLE
 			do
 				create m.make('M')
 				create b.make('B')
 				create j.make('J')
 				create e.make('E')
 				create a.make('A')
+				create death_msg.make_empty
+				create exp_obj.make
 
 				if a_movable.entity_alphabet ~ a then
 					across grid[a_movable.r, a_movable.c].contents is item  loop
 						if item ~ m or item ~ b or item ~ j then
-							remove_dead_given_entity_alphabet(item)
+							death_msg:= shared_info.get_death_message (item.item, m.entity_movable_id , 3, a_movable.movable_id , a_movable.r, a_movable.c)
+							remove_dead_given_entity_alphabet(item, death_msg, a_movable.movable_id)
 						end
 						if item ~ e and not shared_info.explorer.landed then
 							shared_info.explorer.set_is_dead(TRUE)
+
+							--added
+							death_msg:= shared_info.get_death_message (item.item, 0 , 3, a_movable.movable_id , a_movable.r, a_movable.c)
+							exp_obj.set_entity_alphabet(create {ENTITY_ALPHABET}.make ('E'))
+							exp_obj.set_row(shared_info.explorer.exp_coordinates.row)
+							exp_obj.set_column(shared_info.explorer.exp_coordinates.column)
+							exp_obj.set_is_dead(TRUE)
+							exp_obj.set_death_message(death_msg)
+							exp_obj.set_killer_id(a_movable.movable_id)
+							movable_dead_list.force (exp_obj, movable_dead_list_index)
+							movable_dead_list_index := movable_dead_list_index + 1
 						end
 					end
 					a_movable.set_turn(gen.rchoose(0,2))
@@ -861,7 +955,8 @@ feature --commands
 				elseif a_movable.entity_alphabet ~ j then
 					across grid[a_movable.r, a_movable.c].contents is item loop
 						if item ~ a and a_movable.load < 2 then
-							remove_dead_given_entity_alphabet(item)
+							death_msg:= shared_info.get_death_message (item.item, m.entity_movable_id , 6, a_movable.movable_id , a_movable.r, a_movable.c)
+							remove_dead_given_entity_alphabet(item, death_msg , a_movable.movable_id)
 							a_movable.set_load(a_movable.load + 1)
 						end
 					end
@@ -873,7 +968,9 @@ feature --commands
 				elseif a_movable.entity_alphabet ~ b then
 					across grid[a_movable.r, a_movable.c].contents is item loop
 						if item ~ m then
-							remove_dead_given_entity_alphabet(item)
+							death_msg:= shared_info.get_death_message (item.item, m.entity_movable_id , 5, a_movable.movable_id , a_movable.r, a_movable.c)
+							remove_dead_given_entity_alphabet(item, death_msg, a_movable.movable_id )
+
 						end
 					end
 					a_movable.set_turn(gen.rchoose(0,2))
@@ -882,6 +979,16 @@ feature --commands
 						shared_info.explorer.update_life(shared_info.explorer.life - 1) -- explorer dies if life is at 0
 						if shared_info.explorer.life < 1 then
 							shared_info.explorer.set_is_dead(TRUE)
+							--added
+							death_msg:= shared_info.get_death_message ('E', m.entity_movable_id , 4, a_movable.movable_id , a_movable.r, a_movable.c)
+							exp_obj.set_entity_alphabet(create {ENTITY_ALPHABET}.make ('E'))
+							exp_obj.set_row(shared_info.explorer.exp_coordinates.row)
+							exp_obj.set_column(shared_info.explorer.exp_coordinates.column)
+							exp_obj.set_is_dead(TRUE)
+							exp_obj.set_death_message(death_msg)
+							exp_obj.set_killer_id(a_movable.movable_id)
+							movable_dead_list.force (exp_obj, movable_dead_list_index)
+							movable_dead_list_index := movable_dead_list_index + 1
 						end
 					end
 					a_movable.set_turn(gen.rchoose(0,2))
@@ -1040,9 +1147,11 @@ feature -- query
 	 	local
 	 		prev_p:PLANET
 	 		prev_movable: MOVABLE
+	 		l_killer_id: INTEGER
 		do
 			create Result.make_empty
 			create prev_p.make
+			l_killer_id := -2 --will never be -2
 
 
 			Result.append ("  ")
@@ -1076,26 +1185,66 @@ feature -- query
 --				if attached prev_movable then
 --					if(prev_movable.movable_id ~ movable.movable_id) then
 --					else
+					--print("lis_")print(movable.entity_alphabet)print(movable.killer_id)print("%N")
+					if movable.is_reproduced or (movable.is_dead and l_killer_id ~ movable.killer_id and movable.killer_id /~ -2)  then
 						Result.append ("%N")
 						Result.append ("  ")
-						Result.append ("  ")
-						Result.append ("[")
-						Result.append_integer_64 (movable.movable_id)
-						Result.append (",")
-						Result.append_character(movable.entity_alphabet.item)
-						Result.append ("]:[")
-						Result.append_integer_64 (movable.prev_r)
-						Result.append (",")
-						Result.append_integer_64 (movable.prev_c)
-						Result.append (",")
-						Result.append_integer_64 (movable.quadrant)
-						Result.append ("]->[")
+						Result.append ("    ")
+
+						if movable.is_reproduced then
+							Result.append ("reproduced ")Result.append ("[")
+						elseif movable.is_dead and movable.entity_alphabet.item /~ 'E' then
+							Result.append ("destroyed ")Result.append ("[")
+						elseif movable.entity_alphabet.item ~ 'E' then
+							Result.append ("attacked ")Result.append ("[0,E] at [")
+						end
+
+
+						if movable.entity_alphabet.item /~ 'E' then
+							Result.append_integer_64 (movable.movable_id)
+							Result.append (",")
+							Result.append_character(movable.entity_alphabet.item)
+							Result.append ("] at [")
+						end
+
 						Result.append_integer_64 (movable.r)
 						Result.append (",")
 						Result.append_integer_64 (movable.c)
 						Result.append (",")
 						Result.append_integer_64 (movable.new_quadrant)
 						Result.append ("]")
+
+						movable.set_is_reproduced(FALSE)  --MAJOR CHNAGE %%%%%%%%%%%%%%%%%%%%%%%%$$$$
+					else
+						if movable.killer_id /~ -2 then
+							l_killer_id := movable.movable_id
+							Result.append ("%N")
+							Result.append ("  ")
+							Result.append ("  ")
+							Result.append ("[")
+							Result.append_integer_64 (movable.movable_id)
+							Result.append (",")
+							Result.append_character(movable.entity_alphabet.item)
+							Result.append ("]:[")
+							Result.append_integer_64 (movable.prev_r)
+							Result.append (",")
+							Result.append_integer_64 (movable.prev_c)
+							Result.append (",")
+							Result.append_integer_64 (movable.quadrant)
+							Result.append ("]")
+							if movable.prev_r /~ movable.r and movable.prev_c /~ movable.c and movable.quadrant/~movable.new_quadrant then
+								Result.append("->[")
+								Result.append_integer_64 (movable.r)
+								Result.append (",")
+								Result.append_integer_64 (movable.c)
+								Result.append (",")
+								Result.append_integer_64 (movable.new_quadrant)
+								Result.append ("]")
+							end
+
+						end
+
+					end
 --					end
 
 
@@ -1165,7 +1314,7 @@ feature -- query
 --			Result.append ("%N")
 --			Result.append ("  ")
 --			Result.append ("  ")
-			if shared_info.explorer.fuel > 0 then
+			if shared_info.explorer.fuel > 0 or shared_info.explorer.is_dead ~ FALSE then
 				Result.append ("%N")
 				Result.append ("  ")
 				Result.append ("  ")
@@ -1173,15 +1322,49 @@ feature -- query
 			end
 
 			across shared_info.movables_list is movables loop
+				print("lis_")print(movables.entity_alphabet)print(movables.killer_id)print(movables.is_dead)print("%N")
+				if movables.is_dead then
+--					movable_dead_list.force(movables, movable_dead_list_index)
+--					movable_dead_list_index := movable_dead_list_index +1
+
+				else
 					Result.append("%N")
 					Result.append ("  ")
 					Result.append ("  ")
 					Result.append (movables.get_description)
-
+				end
 			end
 		shared_info.stationary_list.remove_head(move_planet_list.count )
 
 		end
+
+
+	deaths_out:STRING
+		do
+			create Result.make_empty
+			across movable_dead_list is dead_movable loop
+				print("entity:")print(dead_movable.entity_alphabet)
+				if attached dead_movable and dead_movable.entity_alphabet.item /~ 'X' then
+					Result.append("%N")
+					Result.append ("  ")
+					Result.append ("  ")
+					if  dead_movable.entity_alphabet.item ~ 'E' then
+						Result.append(shared_info.explorer.get_description)
+					else
+						Result.append (dead_movable.get_description)
+					end
+					Result.append (",")
+					Result.append("%N")
+					Result.append ("  ")
+					Result.append ("    ")
+					Result.append (dead_movable.death_message)
+					dead_movable.set_entity_alphabet(create {ENTITY_ALPHABET}.make ('X'))
+					--dead_movable.set_is_dead(FALSE) --MAJOR CHANGE %%%%&&&&&
+				end
+			end
+			movable_dead_list.remove_head(movable_dead_list.count )
+		end
+
 
 	sector_out: STRING
 		local
@@ -1215,9 +1398,6 @@ feature -- query
 			until
 				row_counter > shared_info.number_rows
 			loop
---				string1.append("    ")
---				string2.append("    ")
-
 				from
 					column_counter := 1
 				until

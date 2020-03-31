@@ -7,6 +7,9 @@ note
 deferred class
 	MOVABLE
 
+--create
+--	make
+
 feature -- common features
 	movable_id: INTEGER  -- ref -> planet_id : INTEGER
 
@@ -14,11 +17,11 @@ feature -- common features
 
 	is_dead: BOOLEAN
 
-	death_message: STRING
-
 	load: INTEGER -- Only applicable to janitaur
 
 	max_load: INTEGER -- only applicable to janitaur
+
+	death_message: STRING
 
 	r: INTEGER
 
@@ -64,6 +67,8 @@ feature -- common features
 	clone_when_quadrant_not_full: BOOLEAN
 
 	is_reproduced: BOOLEAN
+
+	killer_id: INTEGER
 
 
 feature -- commands
@@ -177,6 +182,16 @@ feature -- commands
 			supports_life := yes
 		end
 
+	set_death_message(msg: STRING)
+		do
+			death_message:= msg
+		end
+
+	set_killer_id(id:INTEGER)
+		do
+			killer_id:= id
+		end
+
 
 feature --queries
 
@@ -282,6 +297,14 @@ feature --queries
 
 
 
+		end
+
+	get_death_message: STRING
+		do
+			create Result.make_empty
+
+
+			set_death_message(Result)
 		end
 
 invariant

@@ -178,6 +178,24 @@ feature --commands
 
 
 feature --queries
+
+--	get_movable_object(entity: ENTITY_ALPHABET):MOVABLE
+
+--		local
+--			pointer: INTEGER
+--			l_movable: MOVABLE
+--		do
+--			Result:= l_movable
+--			pointer:= 1
+--			across movables_list is movable_obj loop
+--				if movable_obj.movable_id ~ entity.entity_movable_id then
+--					Result := movable_obj
+--					pointer:= pointer+1
+--				end
+--			end
+
+--		end
+
 	get_error_messages(error_num: INTEGER): STRING
 		do
 			create Result.make_empty
@@ -212,10 +230,82 @@ feature --queries
 
 		end
 
-	get_death_message:STRING
+	get_death_message(entity: CHARACTER; entity_id:INTEGER; death_id:INTEGER; killer_entity_id: INTEGER; d_row:INTEGER; d_col:INTEGER): STRING
+		local
+			dying_entity: STRING
 		do
-			Create Result.make_empty
-			Result := death_message
+
+			create Result.make_empty
+			create dying_entity.make_empty
+
+			if entity ~ 'E' then
+				dying_entity:= "Explorer"
+			elseif entity ~ 'B' then
+				dying_entity:= "Benign"
+			elseif entity ~ 'M' then
+				dying_entity := "Malevolent"
+			elseif entity ~'J' then
+				dying_entity := "Janitaur"
+			elseif entity ~ 'A' then
+				dying_entity := "Asteroid"
+			elseif entity ~ 'P' then
+				dying_entity := "Planet"
+			else
+				dying_entity := "N/A"
+			end
+
+
+			inspect death_id
+			when 1 then --death due to fuel
+				Result.append(dying_entity)
+				Result.append (" got lost in space - out of life support at sector: ")
+				Result.append_integer_64(d_row)
+				Result.append(":")
+				Result.append_integer_64(d_col)
+			when 2 then --death due to blackhole
+ 				Result.append(dying_entity)
+				Result.append (" got devoured by blackhole (id: -1")
+				Result.append (") at sector:3:3")
+			when 3 then --death due to asteroid
+			    Result.append(dying_entity)
+				Result.append (" got destroyed by asteroid (id: ")
+				Result.append_integer_64 (killer_entity_id)
+				Result.append (") at sector:")
+				Result.append_integer_64(d_row)
+				Result.append(":")
+				Result.append_integer_64(d_col)
+			when 4 then --death due to melavolent
+				Result.append(dying_entity)
+				Result.append (" got lost in space - out of life support at sector:")
+				Result.append_integer_64(d_row)
+				Result.append(":")
+				Result.append_integer_64(d_col)
+			when 5 then --death due to benign
+				Result.append(dying_entity)
+				Result.append (" got destroyed by benign (id: ")
+				Result.append_integer_64 (killer_entity_id)
+				Result.append (") at sector:")
+				Result.append_integer_64(d_row)
+				Result.append(":")
+				Result.append_integer_64(d_col)
+			when 6 then --death due to janitaur
+				Result.append(dying_entity)
+				Result.append (" got imploded by janitaur (id: ")
+				Result.append_integer_64 (killer_entity_id)
+				Result.append (") at sector:")
+				Result.append_integer_64(d_row)
+				Result.append(":")
+				Result.append_integer_64(d_col)
+			when 7 then  --only for planet death due to blackhole
+				Result.append("Planet")
+				Result.append (" got devoured by blackhole (id: -1")
+				Result.append (") at sector:3:3")
+			else
+				Result.append(" ")
+			end
+
+
 		end
+
 
 end

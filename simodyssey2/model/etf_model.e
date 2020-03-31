@@ -560,7 +560,10 @@ feature -- queries
 								Result.append (g.description_out)
 								Result.append ("%N")
 								Result.append ("  Deaths This Turn:")
-								Result.append (info.explorer.death_message)
+								--Result.append (info.explorer.death_message)
+								if g.movable_dead_list_index > 0 then
+									Result.append(g.deaths_out)
+								end
 							end
 
 							Result.append(g.out)
