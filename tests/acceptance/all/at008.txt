@@ -1,0 +1,9 @@
+play
+move(E)
+move(S)
+move(S)
+move(S)
+move(S)
+move(W)
+move(W)
+-- Description: Testing for running out of fuel and going out of bounds
