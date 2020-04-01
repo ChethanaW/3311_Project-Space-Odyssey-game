@@ -1,5 +1,8 @@
   state:0.0, ok
   Welcome! Try test(3,5,7,15,30)
+->test(5,3,7,15,30)
+  state:0.1, error
+  Thresholds should be non-decreasing order.
 ->play
   state:1.0, mode:play, ok
   Movement:none

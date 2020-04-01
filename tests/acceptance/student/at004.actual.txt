@@ -1,5 +1,8 @@
   state:0.0, ok
   Welcome! Try test(3,5,7,15,30)
+->test(5,3,7,15,30)
+  state:0.1, error
+  Thresholds should be non-decreasing order.
 ->play
   state:1.0, mode:play, ok
   Movement:none
@@ -60,16 +63,16 @@
     [0,E]->fuel:3/3, life:3/3, landed?:F
     [1,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
     [2,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
-    [3,A]->fuel?:F, action_left_until_reproduction?:F, turns_left:0
-    [4,B]->fuel?:F, action_left_until_reproduction?:F, turns_left:0
+    [3,A]->turns_left:0
+    [4,B]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:0
     [5,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
-    [6,M]->fuel?:F, action_left_until_reproduction?:F, turns_left:0
+    [6,M]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:0
     [7,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
-    [8,A]->fuel?:F, action_left_until_reproduction?:F, turns_left:0
-    [9,B]->fuel?:F, action_left_until_reproduction?:F, turns_left:1
+    [8,A]->turns_left:0
+    [9,B]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:1
     [10,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
     [11,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
-    [12,B]->fuel?:F, action_left_until_reproduction?:F, turns_left:1
+    [12,B]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:1
     [13,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
     [14,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
     [15,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
@@ -152,16 +155,16 @@
     [-1,O]->
     [0,E]->fuel:3/3, life:3/3, landed?:F
     [1,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
-    [2,B]->fuel?:F, action_left_until_reproduction?:F, turns_left:0
+    [2,B]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:0
     [3,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
-    [4,J]->fuel?:F, action_left_until_reproduction?:F, turns_left:0
+    [4,J]->fuel:5/5, load:0/2, actions_left_until_reproduction:2/2, turns_left:0
     [5,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
     [6,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
     [7,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
-    [8,J]->fuel?:F, action_left_until_reproduction?:F, turns_left:1
-    [9,M]->fuel?:F, action_left_until_reproduction?:F, turns_left:1
+    [8,J]->fuel:5/5, load:0/2, actions_left_until_reproduction:2/2, turns_left:1
+    [9,M]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:1
     [10,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
-    [11,B]->fuel?:F, action_left_until_reproduction?:F, turns_left:2
+    [11,B]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:2
   Deaths This Turn:none
     (1:1)  (1:2)  (1:3)  (1:4)  (1:5)  
     E---   P---   W---   ----   B---   

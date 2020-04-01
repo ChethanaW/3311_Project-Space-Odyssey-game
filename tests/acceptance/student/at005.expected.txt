@@ -1,8 +1,59 @@
   state:0.0, ok
   Welcome! Try test(3,5,7,15,30)
-->play
-  state:1.0, mode:play, ok
+->test(3,5,7,15,30)
+  state:1.0, mode:test, ok
   Movement:none
+  Sectors:
+    [1,1]->[0,E],-,-,-
+    [1,2]->[-8,*],-,-,-
+    [1,3]->[1,P],-,-,-
+    [1,4]->-,-,-,-
+    [1,5]->[2,P],[3,P],-,-
+    [2,1]->-,-,-,-
+    [2,2]->-,-,-,-
+    [2,3]->[-5,W],-,-,-
+    [2,4]->-,-,-,-
+    [2,5]->[4,P],-,-,-
+    [3,1]->[5,M],[-6,Y],-,-
+    [3,2]->-,-,-,-
+    [3,3]->[-1,O],-,-,-
+    [3,4]->[6,P],[-11,W],-,-
+    [3,5]->-,-,-,-
+    [4,1]->[-2,W],-,-,-
+    [4,2]->[7,M],[-7,*],-,-
+    [4,3]->[8,P],-,-,-
+    [4,4]->[9,P],[-4,*],-,-
+    [4,5]->-,-,-,-
+    [5,1]->[10,B],[-3,W],-,-
+    [5,2]->-,-,-,-
+    [5,3]->[-10,*],-,-,-
+    [5,4]->-,-,-,-
+    [5,5]->[11,P],[-9,W],-,-
+  Descriptions:
+    [-11,W]->
+    [-10,*]->Luminosity:5
+    [-9,W]->
+    [-8,*]->Luminosity:5
+    [-7,*]->Luminosity:5
+    [-6,Y]->Luminosity:2
+    [-5,W]->
+    [-4,*]->Luminosity:5
+    [-3,W]->
+    [-2,W]->
+    [-1,O]->
+    [0,E]->fuel:3/3, life:3/3, landed?:F
+    [1,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
+    [2,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
+    [3,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [4,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
+    [5,M]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:1
+    [6,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
+    [7,M]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:2
+    [8,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [9,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
+    [10,B]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:1
+    [11,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
+  Deaths This Turn:none
     (1:1)  (1:2)  (1:3)  (1:4)  (1:5)  
     E---   *---   P---   ----   PP--   
     (2:1)  (2:2)  (2:3)  (2:4)  (2:5)  
@@ -14,11 +65,62 @@
     (5:1)  (5:2)  (5:3)  (5:4)  (5:5)  
     BW--   ----   *---   ----   PW--   
 ->move(E)
-  state:2.0, mode:play, ok
+  state:2.0, mode:test, ok
   Movement:
     [0,E]:[1,1,1]->[1,2,2]
     [3,P]:[1,5,2]->[5,4,1]
     [8,P]:[4,3,1]->[3,2,1]
+  Sectors:
+    [1,1]->-,-,-,-
+    [1,2]->[-8,*],[0,E],-,-
+    [1,3]->[1,P],-,-,-
+    [1,4]->-,-,-,-
+    [1,5]->[2,P],-,-,-
+    [2,1]->-,-,-,-
+    [2,2]->-,-,-,-
+    [2,3]->[-5,W],-,-,-
+    [2,4]->-,-,-,-
+    [2,5]->[4,P],-,-,-
+    [3,1]->[5,M],[-6,Y],-,-
+    [3,2]->[8,P],-,-,-
+    [3,3]->[-1,O],-,-,-
+    [3,4]->[6,P],[-11,W],-,-
+    [3,5]->-,-,-,-
+    [4,1]->[-2,W],-,-,-
+    [4,2]->[7,M],[-7,*],-,-
+    [4,3]->-,-,-,-
+    [4,4]->[9,P],[-4,*],-,-
+    [4,5]->-,-,-,-
+    [5,1]->[10,B],[-3,W],-,-
+    [5,2]->-,-,-,-
+    [5,3]->[-10,*],-,-,-
+    [5,4]->[3,P],-,-,-
+    [5,5]->[11,P],[-9,W],-,-
+  Descriptions:
+    [-11,W]->
+    [-10,*]->Luminosity:5
+    [-9,W]->
+    [-8,*]->Luminosity:5
+    [-7,*]->Luminosity:5
+    [-6,Y]->Luminosity:2
+    [-5,W]->
+    [-4,*]->Luminosity:5
+    [-3,W]->
+    [-2,W]->
+    [-1,O]->
+    [0,E]->fuel:3/3, life:3/3, landed?:F
+    [1,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
+    [2,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
+    [3,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
+    [4,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
+    [5,M]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:0
+    [6,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
+    [7,M]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:1
+    [8,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [9,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [10,B]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:0
+    [11,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
+  Deaths This Turn:none
     (1:1)  (1:2)  (1:3)  (1:4)  (1:5)  
     ----   *E--   P---   ----   P---   
     (2:1)  (2:2)  (2:3)  (2:4)  (2:5)  
@@ -30,12 +132,63 @@
     (5:1)  (5:2)  (5:3)  (5:4)  (5:5)  
     BW--   ----   *---   P---   PW--   
 ->move(E)
-  state:3.0, mode:play, ok
+  state:3.0, mode:test, ok
   Movement:
     [0,E]:[1,2,2]->[1,3,2]
     [5,M]:[3,1,1]->[3,5,1]
     [8,P]:[3,2,1]->[2,1,1]
     [10,B]:[5,1,1]->[5,2,1]
+  Sectors:
+    [1,1]->-,-,-,-
+    [1,2]->[-8,*],-,-,-
+    [1,3]->[1,P],[0,E],-,-
+    [1,4]->-,-,-,-
+    [1,5]->[2,P],-,-,-
+    [2,1]->[8,P],-,-,-
+    [2,2]->-,-,-,-
+    [2,3]->[-5,W],-,-,-
+    [2,4]->-,-,-,-
+    [2,5]->[4,P],-,-,-
+    [3,1]->-,[-6,Y],-,-
+    [3,2]->-,-,-,-
+    [3,3]->[-1,O],-,-,-
+    [3,4]->[6,P],[-11,W],-,-
+    [3,5]->[5,M],-,-,-
+    [4,1]->[-2,W],-,-,-
+    [4,2]->[7,M],[-7,*],-,-
+    [4,3]->-,-,-,-
+    [4,4]->[9,P],[-4,*],-,-
+    [4,5]->-,-,-,-
+    [5,1]->-,[-3,W],-,-
+    [5,2]->[10,B],-,-,-
+    [5,3]->[-10,*],-,-,-
+    [5,4]->[3,P],-,-,-
+    [5,5]->[11,P],[-9,W],-,-
+  Descriptions:
+    [-11,W]->
+    [-10,*]->Luminosity:5
+    [-9,W]->
+    [-8,*]->Luminosity:5
+    [-7,*]->Luminosity:5
+    [-6,Y]->Luminosity:2
+    [-5,W]->
+    [-4,*]->Luminosity:5
+    [-3,W]->
+    [-2,W]->
+    [-1,O]->
+    [0,E]->fuel:2/3, life:3/3, landed?:F
+    [1,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [2,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [3,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
+    [4,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [5,M]->fuel:2/3, actions_left_until_reproduction:0/1, turns_left:2
+    [6,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [7,M]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:0
+    [8,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
+    [9,P]->attached?:T, support_life?:F, visited?:F, turns_left:N/A
+    [10,B]->fuel:3/3, actions_left_until_reproduction:0/1, turns_left:0
+    [11,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+  Deaths This Turn:none
     (1:1)  (1:2)  (1:3)  (1:4)  (1:5)  
     ----   *---   PE--   ----   P---   
     (2:1)  (2:2)  (2:3)  (2:4)  (2:5)  
@@ -47,14 +200,14 @@
     (5:1)  (5:2)  (5:3)  (5:4)  (5:5)  
     -W--   B---   *---   P---   PW--   
 ->status
-  state:3.1, mode:play, ok
+  state:3.1, mode:test, ok
   Explorer status report:Travelling at cruise speed at [1,3,2]
   Life units left:3, Fuel units left:2
 ->land
-  state:3.2, mode:play, error
+  state:3.2, mode:test, error
   Negative on that request:no yellow dwarf at Sector:1:3
 ->move(SW)
-  state:4.0, mode:play, ok
+  state:4.0, mode:test, ok
   Movement:
     [0,E]:[1,3,2]->[2,2,1]
     [1,P]:[1,3,1]->[2,4,1]
@@ -66,6 +219,59 @@
       reproduced [12,B] at [5,1,4]
       destroyed [7,M] at [5,1,1]
     [11,P]:[5,5,1]->[4,4,3]
+  Sectors:
+    [1,1]->-,-,-,-
+    [1,2]->[-8,*],-,-,-
+    [1,3]->-,-,-,-
+    [1,4]->-,-,-,-
+    [1,5]->-,-,-,-
+    [2,1]->[8,P],-,-,-
+    [2,2]->[0,E],-,-,-
+    [2,3]->[-5,W],[6,P],-,-
+    [2,4]->[1,P],[4,P],-,-
+    [2,5]->-,[2,P],-,-
+    [3,1]->-,[-6,Y],-,-
+    [3,2]->-,-,-,-
+    [3,3]->[-1,O],-,-,-
+    [3,4]->-,[-11,W],-,-
+    [3,5]->[5,M],-,-,-
+    [4,1]->[-2,W],-,-,-
+    [4,2]->-,[-7,*],-,-
+    [4,3]->-,-,-,-
+    [4,4]->[9,P],[-4,*],[11,P],-
+    [4,5]->-,-,-,-
+    [5,1]->-,[-3,W],[10,B],[12,B]
+    [5,2]->-,-,-,-
+    [5,3]->[-10,*],-,-,-
+    [5,4]->[3,P],-,-,-
+    [5,5]->-,[-9,W],-,-
+  Descriptions:
+    [-11,W]->
+    [-10,*]->Luminosity:5
+    [-9,W]->
+    [-8,*]->Luminosity:5
+    [-7,*]->Luminosity:5
+    [-6,Y]->Luminosity:2
+    [-5,W]->
+    [-4,*]->Luminosity:5
+    [-3,W]->
+    [-2,W]->
+    [-1,O]->
+    [0,E]->fuel:1/3, life:3/3, landed?:F
+    [1,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
+    [2,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [3,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [4,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
+    [5,M]->fuel:2/3, actions_left_until_reproduction:0/1, turns_left:1
+    [6,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [8,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [9,P]->attached?:T, support_life?:F, visited?:F, turns_left:N/A
+    [10,B]->fuel:2/3, actions_left_until_reproduction:1/1, turns_left:2
+    [11,P]->attached?:T, support_life?:F, visited?:F, turns_left:N/A
+    [12,B]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:0
+  Deaths This Turn:
+    [7,M]->fuel:2/3, actions_left_until_reproduction:0/1, turns_left:N/A,
+      Malevolent got destroyed by benign (id: 10) at Sector:5:1
     (1:1)  (1:2)  (1:3)  (1:4)  (1:5)  
     ----   *---   ----   ----   ----   
     (2:1)  (2:2)  (2:3)  (2:4)  (2:5)  
@@ -77,7 +283,7 @@
     (5:1)  (5:2)  (5:3)  (5:4)  (5:5)  
     -WBB   ----   *---   P---   -W--   
 ->move(SW)
-  state:5.0, mode:play, ok
+  state:5.0, mode:test, ok
   Movement:
     [0,E]:[2,2,1]->[3,1,1]
     [2,P]:[2,5,2]->[1,5,1]
@@ -85,6 +291,57 @@
     [6,P]:[2,3,2]->[3,2,1]
     [8,P]:[2,1,1]->[1,5,2]
     [12,B]:[5,1,4]->[5,3,2]
+  Sectors:
+    [1,1]->-,-,-,-
+    [1,2]->[-8,*],-,-,-
+    [1,3]->-,-,-,-
+    [1,4]->[3,P],-,-,-
+    [1,5]->[2,P],[8,P],-,-
+    [2,1]->-,-,-,-
+    [2,2]->-,-,-,-
+    [2,3]->[-5,W],-,-,-
+    [2,4]->[1,P],[4,P],-,-
+    [2,5]->-,-,-,-
+    [3,1]->[0,E],[-6,Y],-,-
+    [3,2]->[6,P],-,-,-
+    [3,3]->[-1,O],-,-,-
+    [3,4]->-,[-11,W],-,-
+    [3,5]->[5,M],-,-,-
+    [4,1]->[-2,W],-,-,-
+    [4,2]->-,[-7,*],-,-
+    [4,3]->-,-,-,-
+    [4,4]->[9,P],[-4,*],[11,P],-
+    [4,5]->-,-,-,-
+    [5,1]->-,[-3,W],[10,B],-
+    [5,2]->-,-,-,-
+    [5,3]->[-10,*],[12,B],-,-
+    [5,4]->-,-,-,-
+    [5,5]->-,[-9,W],-,-
+  Descriptions:
+    [-11,W]->
+    [-10,*]->Luminosity:5
+    [-9,W]->
+    [-8,*]->Luminosity:5
+    [-7,*]->Luminosity:5
+    [-6,Y]->Luminosity:2
+    [-5,W]->
+    [-4,*]->Luminosity:5
+    [-3,W]->
+    [-2,W]->
+    [-1,O]->
+    [0,E]->fuel:2/3, life:3/3, landed?:F
+    [1,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [2,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
+    [3,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [4,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
+    [5,M]->fuel:2/3, actions_left_until_reproduction:0/1, turns_left:0
+    [6,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [8,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
+    [9,P]->attached?:T, support_life?:F, visited?:F, turns_left:N/A
+    [10,B]->fuel:2/3, actions_left_until_reproduction:1/1, turns_left:1
+    [11,P]->attached?:T, support_life?:F, visited?:F, turns_left:N/A
+    [12,B]->fuel:3/3, actions_left_until_reproduction:0/1, turns_left:2
+  Deaths This Turn:none
     (1:1)  (1:2)  (1:3)  (1:4)  (1:5)  
     ----   *---   ----   P---   PP--   
     (2:1)  (2:2)  (2:3)  (2:4)  (2:5)  
@@ -96,20 +353,72 @@
     (5:1)  (5:2)  (5:3)  (5:4)  (5:5)  
     -WB-   ----   *B--   ----   -W--   
 ->status
-  state:5.1, mode:play, ok
+  state:5.1, mode:test, ok
   Explorer status report:Travelling at cruise speed at [3,1,1]
   Life units left:3, Fuel units left:2
 ->land
-  state:5.2, mode:play, error
+  state:5.2, mode:test, error
   Negative on that request:no planets at Sector:3:1
 ->pass
-  state:6.0, mode:play, ok
+  state:6.0, mode:test, ok
   Movement:
     [1,P]:[2,4,1]->[1,3,1]
     [3,P]:[1,4,1]->[1,3,2]
     [5,M]:[3,5,1]->[2,1,1]
       reproduced [13,M] at [2,1,2]
     [6,P]:[3,2,1]->[2,1,3]
+  Sectors:
+    [1,1]->-,-,-,-
+    [1,2]->[-8,*],-,-,-
+    [1,3]->[1,P],[3,P],-,-
+    [1,4]->-,-,-,-
+    [1,5]->[2,P],[8,P],-,-
+    [2,1]->[5,M],[13,M],[6,P],-
+    [2,2]->-,-,-,-
+    [2,3]->[-5,W],-,-,-
+    [2,4]->-,[4,P],-,-
+    [2,5]->-,-,-,-
+    [3,1]->[0,E],[-6,Y],-,-
+    [3,2]->-,-,-,-
+    [3,3]->[-1,O],-,-,-
+    [3,4]->-,[-11,W],-,-
+    [3,5]->-,-,-,-
+    [4,1]->[-2,W],-,-,-
+    [4,2]->-,[-7,*],-,-
+    [4,3]->-,-,-,-
+    [4,4]->[9,P],[-4,*],[11,P],-
+    [4,5]->-,-,-,-
+    [5,1]->-,[-3,W],[10,B],-
+    [5,2]->-,-,-,-
+    [5,3]->[-10,*],[12,B],-,-
+    [5,4]->-,-,-,-
+    [5,5]->-,[-9,W],-,-
+  Descriptions:
+    [-11,W]->
+    [-10,*]->Luminosity:5
+    [-9,W]->
+    [-8,*]->Luminosity:5
+    [-7,*]->Luminosity:5
+    [-6,Y]->Luminosity:2
+    [-5,W]->
+    [-4,*]->Luminosity:5
+    [-3,W]->
+    [-2,W]->
+    [-1,O]->
+    [0,E]->fuel:3/3, life:3/3, landed?:F
+    [1,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
+    [2,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [3,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
+    [4,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [5,M]->fuel:1/3, actions_left_until_reproduction:1/1, turns_left:1
+    [6,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
+    [8,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [9,P]->attached?:T, support_life?:F, visited?:F, turns_left:N/A
+    [10,B]->fuel:2/3, actions_left_until_reproduction:1/1, turns_left:0
+    [11,P]->attached?:T, support_life?:F, visited?:F, turns_left:N/A
+    [12,B]->fuel:3/3, actions_left_until_reproduction:0/1, turns_left:1
+    [13,M]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:0
+  Deaths This Turn:none
     (1:1)  (1:2)  (1:3)  (1:4)  (1:5)  
     ----   *---   PP--   ----   PP--   
     (2:1)  (2:2)  (2:3)  (2:4)  (2:5)  
@@ -121,13 +430,65 @@
     (5:1)  (5:2)  (5:3)  (5:4)  (5:5)  
     -WB-   ----   *B--   ----   -W--   
 ->pass
-  state:7.0, mode:play, ok
+  state:7.0, mode:test, ok
   Movement:
     [2,P]:[1,5,1]->[1,1,1]
     [4,P]:[2,4,2]->[2,5,1]
     [8,P]:[1,5,2]->[1,1,2]
     [10,B]:[5,1,3]->[5,1,1]
     [13,M]:[2,1,2]->[1,2,2]
+  Sectors:
+    [1,1]->[2,P],[8,P],-,-
+    [1,2]->[-8,*],[13,M],-,-
+    [1,3]->[1,P],[3,P],-,-
+    [1,4]->-,-,-,-
+    [1,5]->-,-,-,-
+    [2,1]->[5,M],-,[6,P],-
+    [2,2]->-,-,-,-
+    [2,3]->[-5,W],-,-,-
+    [2,4]->-,-,-,-
+    [2,5]->[4,P],-,-,-
+    [3,1]->[0,E],[-6,Y],-,-
+    [3,2]->-,-,-,-
+    [3,3]->[-1,O],-,-,-
+    [3,4]->-,[-11,W],-,-
+    [3,5]->-,-,-,-
+    [4,1]->[-2,W],-,-,-
+    [4,2]->-,[-7,*],-,-
+    [4,3]->-,-,-,-
+    [4,4]->[9,P],[-4,*],[11,P],-
+    [4,5]->-,-,-,-
+    [5,1]->[10,B],[-3,W],-,-
+    [5,2]->-,-,-,-
+    [5,3]->[-10,*],[12,B],-,-
+    [5,4]->-,-,-,-
+    [5,5]->-,[-9,W],-,-
+  Descriptions:
+    [-11,W]->
+    [-10,*]->Luminosity:5
+    [-9,W]->
+    [-8,*]->Luminosity:5
+    [-7,*]->Luminosity:5
+    [-6,Y]->Luminosity:2
+    [-5,W]->
+    [-4,*]->Luminosity:5
+    [-3,W]->
+    [-2,W]->
+    [-1,O]->
+    [0,E]->fuel:3/3, life:3/3, landed?:F
+    [1,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
+    [2,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [3,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
+    [4,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
+    [5,M]->fuel:1/3, actions_left_until_reproduction:1/1, turns_left:0
+    [6,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
+    [8,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
+    [9,P]->attached?:T, support_life?:F, visited?:F, turns_left:N/A
+    [10,B]->fuel:2/3, actions_left_until_reproduction:0/1, turns_left:1
+    [11,P]->attached?:T, support_life?:F, visited?:F, turns_left:N/A
+    [12,B]->fuel:3/3, actions_left_until_reproduction:0/1, turns_left:0
+    [13,M]->fuel:3/3, actions_left_until_reproduction:0/1, turns_left:2
+  Deaths This Turn:none
     (1:1)  (1:2)  (1:3)  (1:4)  (1:5)  
     PP--   *M--   PP--   ----   ----   
     (2:1)  (2:2)  (2:3)  (2:4)  (2:5)  
@@ -139,8 +500,8 @@
     (5:1)  (5:2)  (5:3)  (5:4)  (5:5)  
     BW--   ----   *B--   ----   -W--   
 ->liftoff
-  state:7.1, mode:play, error
+  state:7.1, mode:test, error
   Negative on that request:you are not on a planet at Sector:3:1
 ->wormhole
-  state:7.2, mode:play, error
+  state:7.2, mode:test, error
   Explorer couldn't find wormhole at Sector:3:1

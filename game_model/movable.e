@@ -23,6 +23,8 @@ feature -- common features
 
 	death_message: STRING
 
+	attacked: BOOLEAN
+
 	r: INTEGER
 
 	c: INTEGER
@@ -192,6 +194,11 @@ feature -- commands
 			killer_id:= id
 		end
 
+	set_is_attacked(status: BOOLEAN)
+		do
+			attacked:= status
+		end
+
 
 feature --queries
 
@@ -275,8 +282,12 @@ feature --queries
 					Result.append("N/A")
 				end
 			elseif entity_alphabet.item ~ 'A' then
-				Result.append("]->turn_left:")
-				Result.append_integer_64(t)
+				Result.append("]->turns_left:")
+				if is_dead ~ FALSE then
+					Result.append_integer_64(t)
+				else
+					Result.append("N/A")
+				end
 			elseif entity_alphabet.item ~ 'J' then
 				Result.append("]->fuel:")
 				Result.append_integer_64(fuel)
@@ -285,14 +296,22 @@ feature --queries
 				Result.append("/2, actions_left_until_reproduction:")
 				Result.append_integer_64(actions_left_until_reproduction)
 				Result.append("/2, turns_left:")
-				Result.append_integer_64(t)
+				if is_dead ~ FALSE then
+					Result.append_integer_64(t)
+				else
+					Result.append("N/A")
+				end
 			else
 				Result.append("]->fuel:")
 				Result.append_integer_64(fuel)
 				Result.append("/3, actions_left_until_reproduction:")
 				Result.append_integer_64(actions_left_until_reproduction)
 				Result.append("/1, turns_left:")
-				Result.append_integer_64(t)
+				if is_dead ~ FALSE then
+					Result.append_integer_64(t)
+				else
+					Result.append("N/A")
+				end
 			end
 
 

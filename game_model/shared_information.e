@@ -115,6 +115,7 @@ feature
 
 
 
+
 feature --commands
 	test(a_threshold: INTEGER; j_threshold: INTEGER; m_threshold: INTEGER; b_threshold: INTEGER; p_threshold: INTEGER)
 		--sets threshold values
@@ -174,6 +175,10 @@ feature --commands
 			movables_id := id
 		end
 
+	set_death_message_status(status:BOOLEAN)
+		do
+			death_message_status := status
+		end
 
 
 
@@ -201,7 +206,7 @@ feature --queries
 			create Result.make_empty
 			inspect error_num
 			when 1 then  -- used by abort, land, liftoff, move, pass, status, wormhole commands
-				Result := "Negative on that request: no mission in progress"
+				Result := "Negative on that request:no mission in progress."
 			when 2 then  -- used by land
 				Result := "Negative on that request:already landed on a planet at Sector:" -- need to append X:Y to the end
 			when 3 then  -- used by land
@@ -237,7 +242,7 @@ feature --queries
 
 			create Result.make_empty
 			create dying_entity.make_empty
-
+			death_message_status := TRUE
 			if entity ~ 'E' then
 				dying_entity:= "Explorer"
 			elseif entity ~ 'B' then
@@ -258,25 +263,25 @@ feature --queries
 			inspect death_id
 			when 1 then --death due to fuel
 				Result.append(dying_entity)
-				Result.append (" got lost in space - out of life support at sector: ")
+				Result.append (" got lost in space - out of fuel at Sector:")
 				Result.append_integer_64(d_row)
 				Result.append(":")
 				Result.append_integer_64(d_col)
 			when 2 then --death due to blackhole
  				Result.append(dying_entity)
 				Result.append (" got devoured by blackhole (id: -1")
-				Result.append (") at sector:3:3")
+				Result.append (") at Sector:3:3")
 			when 3 then --death due to asteroid
 			    Result.append(dying_entity)
 				Result.append (" got destroyed by asteroid (id: ")
 				Result.append_integer_64 (killer_entity_id)
-				Result.append (") at sector:")
+				Result.append (") at Sector:")
 				Result.append_integer_64(d_row)
 				Result.append(":")
 				Result.append_integer_64(d_col)
 			when 4 then --death due to melavolent
 				Result.append(dying_entity)
-				Result.append (" got lost in space - out of life support at sector:")
+				Result.append (" got lost in space - out of life support at Sector:")
 				Result.append_integer_64(d_row)
 				Result.append(":")
 				Result.append_integer_64(d_col)
@@ -284,7 +289,7 @@ feature --queries
 				Result.append(dying_entity)
 				Result.append (" got destroyed by benign (id: ")
 				Result.append_integer_64 (killer_entity_id)
-				Result.append (") at sector:")
+				Result.append (") at Sector:")
 				Result.append_integer_64(d_row)
 				Result.append(":")
 				Result.append_integer_64(d_col)
@@ -292,14 +297,14 @@ feature --queries
 				Result.append(dying_entity)
 				Result.append (" got imploded by janitaur (id: ")
 				Result.append_integer_64 (killer_entity_id)
-				Result.append (") at sector:")
+				Result.append (") at Sector:")
 				Result.append_integer_64(d_row)
 				Result.append(":")
 				Result.append_integer_64(d_col)
 			when 7 then  --only for planet death due to blackhole
 				Result.append("Planet")
 				Result.append (" got devoured by blackhole (id: -1")
-				Result.append (") at sector:3:3")
+				Result.append (") at Sector:3:3")
 			else
 				Result.append(" ")
 			end

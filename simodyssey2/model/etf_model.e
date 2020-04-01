@@ -51,6 +51,7 @@ feature {NONE} -- Initialization
          	--create planet.make
          	create g.dummy_galaxy_make
          	info := sa.shared_info
+         	info.set_death_message_status(FALSE)
 
          end
 
@@ -107,6 +108,7 @@ feature -- model operations
 
 			error:= FALSE
 			entity_movement:= FALSE
+			info.set_death_message_status(FALSE)
 
 			--empty all lists created at the beginning of pplay and abort
 			info.movables_entity_list.make_empty
@@ -135,7 +137,7 @@ feature -- model operations
 		do
 			cmd_name:="land"
 			error:= FALSE
-
+			info.set_death_message_status(FALSE)
 
 
 			if mode ~ "abort" or mode ~ "start" then
@@ -183,6 +185,7 @@ feature -- model operations
 		do
 			cmd_name:="liftoff"
 			error:= FALSE
+			info.set_death_message_status(FALSE)
 
 			if mode ~ "abort" or mode ~ "start" then
 				error:= TRUE
@@ -213,6 +216,7 @@ feature -- model operations
 		do
 			cmd_name:="move"
 			error:= FALSE
+			info.set_death_message_status(FALSE)
 
 			if mode ~ "abort" or mode ~ "start" or fuel_check_game_over then
 				error:= TRUE
@@ -251,6 +255,7 @@ feature -- model operations
 		do
 			cmd_name:="pass"
 			error:= FALSE
+			info.set_death_message_status(FALSE)
 
 			if mode ~ "abort" or mode ~ "start" then
 				error:= TRUE
@@ -271,6 +276,9 @@ feature -- model operations
 		do
 			cmd_name:="play"
 			error:= FALSE
+
+			info.set_death_message_status(FALSE)
+
 			movement_out := FALSE
 	 		entity_movement:= FALSE -- nothing moves
 			play_check:= play_check + 1
@@ -303,6 +311,8 @@ feature -- model operations
 		do
 			cmd_name:="status"
 			error:= FALSE
+			info.set_death_message_status(FALSE)
+
 			update_status
 			entity_movement:= FALSE --nothing moves
 
@@ -325,8 +335,16 @@ feature -- model operations
 		do
 			cmd_name:= "test"
 			error:= FALSE
+			info.set_death_message_status(FALSE)
 			movement_out:= FALSE
 			entity_movement:= FALSE -- nothing moves
+
+			if not (0 < a_threshold and a_threshold <= j_threshold and j_threshold <= m_threshold and m_threshold <= b_threshold and b_threshold <= p_threshold and p_threshold <= 101)then
+					--print("error hereeeee")
+					error_message:= info.get_error_messages (10)
+					error:= TRUE
+			else
+
 			play_check:= play_check + 1
 			if mode ~ "abort" or mode ~ "start" then
 
@@ -334,8 +352,16 @@ feature -- model operations
 				g := new_galaxy(a_threshold,j_threshold,m_threshold,b_threshold,p_threshold)
 				board_print := g.out
 			else
+
+--				if not (0 < a_threshold and a_threshold <= j_threshold and j_threshold <= m_threshold and m_threshold <= b_threshold and b_threshold <= p_threshold and p_threshold <= 101)then
+--					print("error hereeeee")
+--					error_message:= info.get_error_messages (10)
+--				else
+					error_message:= info.get_error_messages (9)
+				--end
 				error:= TRUE
-				error_message:= info.get_error_messages (9)
+
+			end
 			end
 
 			update_status
@@ -350,6 +376,7 @@ feature -- model operations
 			create entity.make('E')
 			cmd_name:="wormhole"
 			error:= FALSE
+			info.set_death_message_status(FALSE)
 
 			if mode ~ "abort" or mode ~ "start" then
 				error:= TRUE
@@ -465,20 +492,30 @@ feature -- queries
 					Result.append ("%N")
 					Result.append ("  ")
 
-					if fuel_check_game_over then
-						if info.explorer.is_dead then
-							Result.append("Explorer got devoured by blackhole (id: -1) at Sector:3:3")
-						else
-						Result.append("Explorer got lost in space - out of fuel at Sector:")
-						Result.append_integer_64(info.explorer.exp_coordinates.row)
-						Result.append(":")
-						Result.append_integer_64(info.explorer.exp_coordinates.column)
+--					if fuel_check_game_over then
+--						if info.explorer.is_dead then
+--							Result.append("Explorer got devoured by blackhole (id: -1) at Sector:3:3")
+--						else
+--						Result.append("Explorer got lost in space - out of fuel at Sector:")
+--						Result.append_integer_64(info.explorer.exp_coordinates.row)
+--						Result.append(":")
+--						Result.append_integer_64(info.explorer.exp_coordinates.column)
+--						Result.append("%N")
+--						Result.append("  The game has ended. You can start a new game.")
+--						end
+--						Result.append("%N  ")
+
+--					end
+
+
+					if info.explorer.is_dead then
+						Result.append(info.explorer.death_message)
 						Result.append("%N")
 						Result.append("  The game has ended. You can start a new game.")
-						end
 						Result.append("%N  ")
-
 					end
+
+
 
 
 					if cmd_name ~ "abort" or cmd_name ~ "status" then
@@ -548,8 +585,11 @@ feature -- queries
 								Result.append("Movement:none")
 							else
 								Result.append("Movement:")
-								if cmd_name /~ "pass" then
+								if cmd_name ~ "pass" or cmd_name ~ "land" or cmd_name ~ "liftoff" then
+								else
 									Result.append("%N")
+									Result.append ("  ")
+									Result.append ("  ")
 								end
 
 								Result.append(g.out_movement)
@@ -561,12 +601,25 @@ feature -- queries
 								Result.append ("%N")
 								Result.append ("  Deaths This Turn:")
 								--Result.append (info.explorer.death_message)
-								if g.movable_dead_list_index > 0 then
+								if info.death_message_status then
 									Result.append(g.deaths_out)
+								else
+									Result.append("none")
 								end
 							end
 
 							Result.append(g.out)
+
+							if info.explorer.is_dead and fuel_check_game_over ~ FALSE then
+								Result.append("%N")
+								Result.append("  ")
+								Result.append(info.explorer.death_message)
+								Result.append("%N")
+								Result.append("  The game has ended. You can start a new game.")
+								mode:= "abort"
+								error:= TRUE
+							end
+
 						end
 
 
