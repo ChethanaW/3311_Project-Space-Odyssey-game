@@ -414,9 +414,9 @@ feature --commands
 						temp_column := 5
 					end
 
-
+				get_movable_quadrant(movable_obj, movable_obj.r, movable_obj.c)
 				if not grid[temp_row, temp_column].is_full then -- if there's an empty space or there's '-'
-						get_movable_quadrant(movable_obj, movable_obj.r, movable_obj.c)
+
 						grid[movable_obj.r, movable_obj.c].contents.go_i_th(movable_obj.quadrant)
 						grid[movable_obj.r, movable_obj.c].contents.replace(letter_replacement)
 						--print("THeobject entity aphabet is ")print(movable_obj.entity_alphabet)print("%N")
@@ -441,6 +441,10 @@ feature --commands
 						movable_obj.set_column (temp_column)
 						move_movable_list.force (movable_obj, movables_move_index)
 						movables_move_index := movables_move_index + 1
+						if movable_obj.entity_alphabet ~ create{ENTITY_ALPHABET}.make('M') or movable_obj.entity_alphabet ~ create{ENTITY_ALPHABET}.make('B') or movable_obj.entity_alphabet ~ create{ENTITY_ALPHABET}.make('J') then
+							movable_obj.set_fuel(movable_obj.fuel - 1)
+
+						end
 					else -- else if it's full
 						movable_obj.set_prev_r_c(movable_obj.r,movable_obj.c)
 						movable_obj.set_entity_alphabet (movable_obj.entity_alphabet)
@@ -469,10 +473,7 @@ feature --commands
 					end
 
 
-					if movable_obj.entity_alphabet ~ create{ENTITY_ALPHABET}.make('M') or movable_obj.entity_alphabet ~ create{ENTITY_ALPHABET}.make('B') or movable_obj.entity_alphabet ~ create{ENTITY_ALPHABET}.make('J') then
-						movable_obj.set_fuel(movable_obj.fuel - 1)
 
-					end
 
 
 		end
@@ -660,11 +661,11 @@ feature --commands
 			temp_row := gen.rchoose(1,5)
 			temp_col := gen.rchoose(1,5)
 
-
+			get_movable_quadrant(a_movable, a_movable.r, a_movable.c)
 			if not grid[temp_row, temp_col].is_full then -- if there's an empty space or there's '-'
 				--print("this went through a wormhole ")print(a_movable.entity_alphabet)print(" ")print(a_movable.movable_id)
 				--print("the row and column are ")print(a_movable.r)print(" ")print(a_movable.c)print("%N")
-				get_movable_quadrant(a_movable, a_movable.r, a_movable.c)--print("the movables quadrant is ")print(a_movable.quadrant)
+				--get_movable_quadrant(a_movable, a_movable.r, a_movable.c)--print("the movables quadrant is ")print(a_movable.quadrant)
 				grid[a_movable.r, a_movable.c].contents.go_i_th (a_movable.quadrant)
 				grid[a_movable.r, a_movable.c].contents.replace (letter_replacement)
 
@@ -1011,6 +1012,16 @@ feature --commands
 				elseif a_movable.entity_alphabet ~ m then
 					if movable_check_for_explorer(a_movable) and not movable_check_for_benign(a_movable) and not shared_info.explorer.landed then
 						shared_info.explorer.update_life(shared_info.explorer.life - 1) -- explorer dies if life is at 0
+						--add to the movable list too
+						exp_obj.set_entity_alphabet(create {ENTITY_ALPHABET}.make ('E'))
+						exp_obj.set_row(shared_info.explorer.exp_coordinates.row)
+						exp_obj.set_column(shared_info.explorer.exp_coordinates.column)
+						exp_obj.set_new_quadrant(shared_info.explorer.quadrant)
+						exp_obj.set_is_attacked(TRUE)
+						exp_obj.set_killer_id(a_movable.movable_id)
+						move_movable_list.force (exp_obj, movables_move_index)
+						movables_move_index := movables_move_index + 1
+
 						if shared_info.explorer.life < 1 then
 							shared_info.explorer.set_is_dead(TRUE)
 							shared_info.explorer.update_life(0)
@@ -1027,9 +1038,12 @@ feature --commands
 							movable_dead_list.force (exp_obj, movable_dead_list_index)
 							movable_dead_list_index := movable_dead_list_index + 1
 
-							--add to the movable list too
-							move_movable_list.force (exp_obj, movables_move_index)
-							movables_move_index := movables_move_index + 1
+							grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.go_i_th (shared_info.explorer.quadrant)
+							grid[shared_info.explorer.exp_coordinates.row, shared_info.explorer.exp_coordinates.column].contents.replace (letter_replacement)
+
+--							--add to the movable list too
+--							move_movable_list.force (exp_obj, movables_move_index)
+--							movables_move_index := movables_move_index + 1
 						end
 					end
 					a_movable.set_turn(gen.rchoose(0,2))

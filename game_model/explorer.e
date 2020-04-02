@@ -41,6 +41,7 @@ feature {NONE} -- Initialization
 			is_dead:= false
 			has_yellow_dwarf:= false
 			has_planets:= false
+			quadrant := 1
 		end
 feature -- model attributes
 

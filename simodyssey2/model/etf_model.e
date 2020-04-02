@@ -264,6 +264,10 @@ feature -- model operations
 				-- things to do if pass is used at a valid time
 				info.set_skip_explorer_coordinates(TRUE)
 				entity_movement:= TRUE -- bcs planets and others move without the explorer
+
+				if info.explorer.has_yellow_dwarf and not info.explorer.landed then
+					info.explorer.update_fuel(3)
+				end
 				g.move_movables
 			end
 

@@ -133,8 +133,15 @@ feature -- commands
 				if attached movables and attached component then
 					movables.set_row (row) -- changes did  %%%%%%%%%%%%%%%%%%%%%%%%%
 					movables.set_column (column) -- changes did  %%%%%%%%%%%%%%%%%%%%%%%%%
-					movables.set_quadrant (i)
+					if (row ~ 1 and column ~ 1 and i ~ 1) then
+						movables.set_quadrant (2)
+						movables.set_new_quadrant (2)
+					else
+						movables.set_quadrant (i)
+						movables.set_new_quadrant (i)
+					end
 					movables.set_id (shared_info.movables_id)
+					--print(" old new id : ")print(movables.quadrant)print(movables.new_quadrant)print(movables.movable_id)print("%N")
 					movables.set_entity_alphabet(component)
 
 					component.represents_movable_id (movables.movable_id)

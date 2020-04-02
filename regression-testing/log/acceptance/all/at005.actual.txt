@@ -1,14 +1,3 @@
- old new id : 111
- old new id : 222
- old new id : 333
- old new id : 114
- old new id : 115
- old new id : 336
- old new id : 117
- old new id : 118
- old new id : 119
- old new id : 2210
- old new id : 1111
   state:0.0, ok
   Welcome! Try test(3,5,7,15,30)
 ->test(3,5,7,15,30)
@@ -416,7 +405,7 @@
     [-3,W]->
     [-2,W]->
     [-1,O]->
-    [0,E]->fuel:2/3, life:3/3, landed?:F
+    [0,E]->fuel:3/3, life:3/3, landed?:F
     [1,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
     [2,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
     [3,P]->attached?:F, support_life?:F, visited?:F, turns_left:2
@@ -486,7 +475,7 @@
     [-3,W]->
     [-2,W]->
     [-1,O]->
-    [0,E]->fuel:2/3, life:3/3, landed?:F
+    [0,E]->fuel:3/3, life:3/3, landed?:F
     [1,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
     [2,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
     [3,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
