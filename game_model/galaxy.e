@@ -58,6 +58,8 @@ feature -- attributes
 	movables_move_index: INTEGER
 	movable_dead_list: ARRAY[MOVABLE]
 	movable_dead_list_index :INTEGER
+	tmp_dead_list_to_sort: ARRAY[MOVABLE]
+	tmp_array_index: INTEGER
 
 
 
@@ -110,7 +112,9 @@ feature --constructor
 			create letter_for_movable.make('B')
 			create move_movable_list.make_empty
 			create movable_dead_list.make_empty
+			create tmp_dead_list_to_sort.make_empty
 			movables_move_index :=0
+			tmp_array_index:=0
 
 
 	end
@@ -134,6 +138,7 @@ feature -- constructor
 			create letter_for_movable.make('B')
 			create move_movable_list.make_empty
 			create movable_dead_list.make_empty
+			create tmp_dead_list_to_sort.make_empty
 
 		end
 
@@ -529,15 +534,84 @@ feature --commands
 						move_movable_list.force (obj, movables_move_index)
 						movables_move_index := movables_move_index + 1
 
+--						--add tmp dead list to sort by index
+--						tmp_dead_list_to_sort.force (obj, tmp_array_index)
+--						tmp_array_index := tmp_array_index + 1
+
 						across grid[obj.r, obj.c].contents is entity loop
 							if entity.entity_movable_id ~ obj.movable_id then
 								grid[obj.r, obj.c].contents.go_i_th(pointer)
 								grid[obj.r, obj.c].contents.replace(letter_replacement)
+								obj.set_new_quadrant(pointer)
 							end
 							pointer:= pointer+1
 						end
 					end
 				end
+			end
+
+		sort_tmp_dead_array
+			local
+				tmp_movable: MOVABLE
+				i:INTEGER
+				j:INTEGER
+
+			do
+--				create Result.make_empty
+--				Result.compare_objects
+--				pointer:= tmp_array_list_to_sort.count
+--				across shared_info.movables_list is obj loop
+--					if obj.movable_id ~ a_entity.entity_movable_id then
+--						obj.set_is_dead(true)
+--						obj.set_death_message(death_message)
+--						obj.set_killer_id(killer_id)
+--						movable_dead_list.force (obj, movable_dead_list_index)
+--						movable_dead_list_index := movable_dead_list_index + 1
+
+--						--add to the movable list too
+--						move_movable_list.force (obj, movables_move_index)
+--						movables_move_index := movables_move_index + 1
+
+--						across grid[obj.r, obj.c].contents is entity loop
+--							if entity.entity_movable_id ~ obj.movable_id then
+--								grid[obj.r, obj.c].contents.go_i_th(pointer)
+--								grid[obj.r, obj.c].contents.replace(letter_replacement)
+--								obj.set_new_quadrant(pointer)
+--							end
+--							pointer:= pointer+1
+--						end
+--					end
+--				end
+
+				if tmp_dead_list_to_sort.count /~ 0 then
+					from
+					    i := 0
+					until
+					    i < tmp_dead_list_to_sort.count -1
+					loop
+					    -- do something
+					    from
+						    j := i+1
+						until
+						    j <  tmp_dead_list_to_sort.count -1
+						loop
+						    -- do something
+						    if attached tmp_dead_list_to_sort[i] and attached tmp_dead_list_to_sort[j] then
+						    	tmp_movable := tmp_dead_list_to_sort[i]
+				                tmp_dead_list_to_sort[i] := tmp_dead_list_to_sort[j]
+				                tmp_dead_list_to_sort[j] := tmp_movable
+						    end
+
+
+
+						    j := j + 1
+						end
+					    i := i + 1
+					end
+				end
+
+
+				--Result := tmp_dead_list_to_sort
 			end
 
 
@@ -619,11 +693,17 @@ feature --commands
 
 						if not movable_object.is_dead then
 
+							tmp_array_index := 0
+
 							reproduce(movable_object)
 							behave(movable_object)
+--							print(tmp_dead_list_to_sort.count)
+--							if tmp_dead_list_to_sort.count /~ 0 then
+--								tmp_dead_list_to_sort.remove_head(tmp_dead_list_to_sort.count)
+--							end
 						end
 
-						if movable_object.entity_alphabet ~ create {ENTITY_ALPHABET}.make ('P') then
+						if movable_object.entity_alphabet ~ create {ENTITY_ALPHABET}.make ('P') and not movable_object.is_dead then
 							if movable_object.has_star = false then
 								turn:=gen.rchoose (0, 2)
 								movable_object.set_turn(turn)
@@ -953,6 +1033,7 @@ feature --commands
 				a: ENTITY_ALPHABET
 				death_msg: STRING
 				exp_obj: EXPLORER_MOVABLE
+
 			do
 				create m.make('M')
 				create b.make('B')
@@ -1049,6 +1130,17 @@ feature --commands
 					a_movable.set_turn(gen.rchoose(0,2))
 
 				end
+
+--				sort_tmp_dead_array
+--				--add sorted dead into movable and movable_dead list
+--				across tmp_dead_list_to_sort is movable_to_add loop
+--					movable_dead_list.force (movable_to_add, movable_dead_list_index)
+--					movable_dead_list_index := movable_dead_list_index + 1
+
+--					--add to the movable list too
+--					move_movable_list.force (movable_to_add, movables_move_index)
+--					movables_move_index := movables_move_index + 1
+--				end
 		end
 
 feature -- query
@@ -1133,6 +1225,7 @@ feature -- query
 			end
 			if shared_info.explorer.fuel < 1 then
 				fuel_check := true
+				--shared.info.explorer.set_is_dead(TRUE)
 			end
 		end
 

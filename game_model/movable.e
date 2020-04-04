@@ -277,8 +277,14 @@ feature --queries
 				end
 				Result.append("turns_left:")
 				if star_val ~ False then
-					Result.append_integer_64(t)
+					if is_dead ~ FALSE then
+						Result.append_integer_64(t)
+					end
 				else
+					Result.append("N/A")
+				end
+
+				if is_dead ~ TRUE then
 					Result.append("N/A")
 				end
 			elseif entity_alphabet.item ~ 'A' then

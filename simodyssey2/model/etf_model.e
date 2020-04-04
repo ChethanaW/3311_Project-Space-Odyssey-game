@@ -286,14 +286,16 @@ feature -- model operations
 			movement_out := FALSE
 	 		entity_movement:= FALSE -- nothing moves
 			play_check:= play_check + 1
-			info.explorer.update_fuel(3)
-			info.explorer.update_coord (1, 1)
-			info.explorer.set_quadrant (1) -- verify
+
 
 
 			if mode ~"abort" or mode ~ "start" then
 				--play_check:= play_check + 1
 				mode:= "play"
+				info.explorer.update_fuel(3)
+				info.explorer.update_life(3)
+				info.explorer.update_coord (1, 1)
+				info.explorer.set_quadrant (1) -- verify
 				--g := new_galaxy(3,5,7,15,30)
 				info.test(3,5,7,15,30)
          		create g.make
@@ -350,9 +352,15 @@ feature -- model operations
 			else
 
 			play_check:= play_check + 1
+
+
 			if mode ~ "abort" or mode ~ "start" then
 
 				mode:= "test"
+				info.explorer.update_fuel(3)
+				info.explorer.update_life(3)
+				info.explorer.update_coord (1, 1)
+				info.explorer.set_quadrant (1) -- verify
 				g := new_galaxy(a_threshold,j_threshold,m_threshold,b_threshold,p_threshold)
 				board_print := g.out
 			else
@@ -614,12 +622,15 @@ feature -- queries
 
 							Result.append(g.out)
 
-							if info.explorer.is_dead and fuel_check_game_over ~ FALSE then
-								Result.append("%N")
-								Result.append("  ")
-								Result.append(info.explorer.death_message)
-								Result.append("%N")
-								Result.append("  The game has ended. You can start a new game.")
+							if info.explorer.is_dead or fuel_check_game_over ~ TRUE  then
+								if mode ~ "test" then
+									Result.append("%N")
+									Result.append("  ")
+									Result.append(info.explorer.death_message)
+									Result.append("%N")
+									Result.append("  The game has ended. You can start a new game.")
+								end
+
 								mode:= "abort"
 								error:= TRUE
 							end

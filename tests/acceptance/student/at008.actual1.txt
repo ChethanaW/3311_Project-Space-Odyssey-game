@@ -1,4 +1,4 @@
-here  state:0.0, ok
+  state:0.0, ok
   Welcome! Try test(3,5,7,15,30)
 ->play
   state:1.0, mode:play, ok
@@ -147,5 +147,3 @@ here  state:0.0, ok
     W---   -*--   ----   P*P-   ----   
     (5:1)  (5:2)  (5:3)  (5:4)  (5:5)  
     -WB-   BB--   *---   ----   PW--   
-  Explorer got lost in space - out of fuel at Sector:5:5
-  The game has ended. You can start a new game.

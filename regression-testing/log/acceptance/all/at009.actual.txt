@@ -278,9 +278,11 @@
     W---   -*--   ----   P*P-   ----   
     (5:1)  (5:2)  (5:3)  (5:4)  (5:5)  
     -WBB   ----   *---   P---   -W--   
+  Explorer got lost in space - out of fuel at Sector:1:1
+  The game has ended. You can start a new game.
 ->abort
-  state:4.1, ok
-  Mission aborted. Try test(3,5,7,15,30)
+  state:4.1, error
+  Negative on that request:no mission in progress.
 ->test(3,5,7,15,30)
   state:5.0, mode:test, ok
   Movement:none
@@ -322,7 +324,7 @@
     [-3,*]->Luminosity:5
     [-2,*]->Luminosity:5
     [-1,O]->
-    [0,E]->fuel:0/3, life:0/3, landed?:F
+    [0,E]->fuel:3/3, life:3/3, landed?:F
     [1,P]->attached?:F, support_life?:F, visited?:F, turns_left:1
     [2,A]->turns_left:0
     [3,B]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:1
@@ -389,7 +391,7 @@
     [-3,*]->Luminosity:5
     [-2,*]->Luminosity:5
     [-1,O]->
-    [0,E]->fuel:3/3, life:0/3, landed?:F
+    [0,E]->fuel:3/3, life:3/3, landed?:F
     [1,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
     [2,A]->turns_left:2
     [3,B]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:0
@@ -414,7 +416,7 @@
 ->status
   state:6.1, mode:test, ok
   Explorer status report:Travelling at cruise speed at [2,2,2]
-  Life units left:0, Fuel units left:3
+  Life units left:3, Fuel units left:3
 ->move(SE)
   state:7.0, mode:test, ok
   Explorer got devoured by blackhole (id: -1) at Sector:3:3
@@ -487,12 +489,11 @@
     ----   ----   P*--   B---   ----   
     (5:1)  (5:2)  (5:3)  (5:4)  (5:5)  
     *---   *---   ----   P---   *AP-   
-->status
-  state:7.1, mode:test, ok
   Explorer got devoured by blackhole (id: -1) at Sector:3:3
   The game has ended. You can start a new game.
-  Explorer status report:Travelling at cruise speed at [3,3,2]
-  Life units left:0, Fuel units left:2
+->status
+  state:7.1, error
+  Negative on that request:no mission in progress.
 ->move(S)
-  state:8.0, mode:test, error
+  state:7.2, error
   Negative on that request:no mission in progress.

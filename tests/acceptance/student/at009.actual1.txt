@@ -1,4 +1,4 @@
-here  state:0.0, ok
+  state:0.0, ok
   Welcome! Try test(3,5,7,15,30)
 ->test(3,5,7,15,30)
   state:1.0, mode:test, ok
