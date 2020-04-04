@@ -18,8 +18,7 @@ create
 
 feature -- attributes
 
-	grid: ARRAY2 [SECTOR]
-			-- the board
+	grid: ARRAY2 [SECTOR] -- the board
 
 	gen: RANDOM_GENERATOR_ACCESS
 
@@ -29,9 +28,10 @@ feature -- attributes
 		attribute
 			Result:= shared_info_access.shared_info
 		end
+
 	flag : INTEGER
 
-	du: DIRECTION_UTILITY
+	du: DIRECTION_UTILITY -- to get the directional values
 
 	explorer : ENTITY_ALPHABET
 
@@ -39,18 +39,13 @@ feature -- attributes
 
 	letter_replacement: ENTITY_ALPHABET
 
-	turn_flag : INTEGER
+	turn_flag : INTEGER -- keep track of turn values
 
-	fuel_check: BOOLEAN
+	fuel_check: BOOLEAN -- check the fuel status
 
-	-- --ex: EXPLORER
+	explorer_object: EXPLORER -- explorer of the galaxy(only one)
 
-	 last_coord: EXPLORER
-
-	move_planet_list : ARRAY[PLANET]
-	p_move_index: INTEGER
 	stat_id: INTEGER
-
 
 	-- for movables  %%%%%%%%%%%%%%%%%%%%%%%%%
 	letter_for_movable : ENTITY_ALPHABET
@@ -91,21 +86,16 @@ feature --constructor
 				row := row + 1
 			end
 			set_stationary_items
-			--create player_coord.make (1, 1, create{ENTITY_ALPHABET}.make ('E'))
-			--create last_coord.make (player_coord.row.deep_twin, player_coord.column.deep_twin, create{ENTITY_ALPHABET}.make ('E'))
-			--last_coord := player_coord.deep_twin
+
 			create explorer.make ('E')
 			create letter_p.make('P')
 			turn_flag := 0
 			-- create ex.make
-			create last_coord.make
-			last_coord := shared_info.explorer.deep_twin
+			create explorer_object.make
+			explorer_object := shared_info.explorer.deep_twin
 			flag := 0
 
 			create letter_replacement.make('-')
-			create move_planet_list.make_empty
-			move_planet_list.compare_objects
-			p_move_index :=0
 			fuel_check := false
 
 			-- for movables
@@ -124,17 +114,11 @@ feature -- constructor
 	dummy_galaxy_make
 		do
 			create grid.make_filled (create {SECTOR}.make_dummy, shared_info.number_rows, shared_info.number_columns)
-			--create player_coord.make (1, 1, create{ENTITY_ALPHABET}.make ('E'))
-			--create last_coord.make (player_coord.row.deep_twin, player_coord.column.deep_twin, create{ENTITY_ALPHABET}.make ('E'))
-			--last_coord := player_coord.deep_twin
 			create explorer.make ('E')
 			create letter_p.make('P')
-			-- create ex.make
-			create last_coord.make
-			last_coord := shared_info.explorer.deep_twin
+			create explorer_object.make
+			explorer_object := shared_info.explorer.deep_twin
 			create letter_replacement.make('-')
-			create move_planet_list.make_empty
-
 			create letter_for_movable.make('B')
 			create move_movable_list.make_empty
 			create movable_dead_list.make_empty
@@ -189,6 +173,7 @@ feature --commands
 				create yellow_dwarf.make
 				stationary:= yellow_dwarf
 				stationary.set_id (id_s)
+				stationary.set_entity('Y')
 				stationary.set_luminosity(2)
 				stationary.set_row(r)
 				stationary.set_column(c)
@@ -200,6 +185,7 @@ feature --commands
 				create blue_giant.make
 				stationary:= blue_giant
 				stationary.set_id (id_s)
+				stationary.set_entity('*')
 				stationary.set_luminosity(5)
 				stationary.set_row(r)
 				stationary.set_column(c)
@@ -211,6 +197,7 @@ feature --commands
 				create wormhole.make
 				stationary:=wormhole
 				stationary.set_id (id_s)
+				stationary.set_entity('W')
 				stationary.set_luminosity(0)
 				stationary.set_row(r)
 				stationary.set_column(c)
@@ -224,9 +211,7 @@ feature --commands
 
 	move_player(row_input: INTEGER; column_input: INTEGER; a_explorer:ENTITY_ALPHABET): BOOLEAN
 
-			-- Basic implementation of player movement in the maze.
-			-- Move the player with a y_delta = `row_mod` and x_delta = `col_mod`
-			-- d: TUPLE[row_mod: INTEGER; col_mod: INTEGER]
+			-- Basic implementation of player movement in the galaxy.
 
 		local
 
@@ -244,11 +229,11 @@ feature --commands
 			pointer := 1
 
 
-			last_coord := shared_info.explorer.deep_twin -- update last coord
+			explorer_object := shared_info.explorer.deep_twin -- update last coord
 
-			shared_info.explorer.set_prev_coord (last_coord.exp_coordinates.row,last_coord.exp_coordinates.column)
+			shared_info.explorer.set_prev_coord (explorer_object.exp_coordinates.row,explorer_object.exp_coordinates.column)
 			quadrant := 1
-			across grid[last_coord.exp_coordinates.row, last_coord.exp_coordinates.column].contents is entity
+			across grid[explorer_object.exp_coordinates.row, explorer_object.exp_coordinates.column].contents is entity
 			loop
 				if entity ~ create{ENTITY_ALPHABET}.make('E') then
 					shared_info.explorer.set_prev_quadrant (quadrant)
@@ -256,8 +241,8 @@ feature --commands
 				quadrant := quadrant +1
 			end
 
-			temp_row := last_coord.exp_coordinates.row + row_input
-			temp_col := last_coord.exp_coordinates.column + column_input
+			temp_row := explorer_object.exp_coordinates.row + row_input
+			temp_col := explorer_object.exp_coordinates.column + column_input
 
 			if temp_row > 5 then
 				temp_row := 1
@@ -807,11 +792,11 @@ feature --commands
 			placed_on_letter_replacement := false
 			pointer := 1
 
-			last_coord := shared_info.explorer.deep_twin -- update last coord
-			shared_info.explorer.set_prev_coord (last_coord.exp_coordinates.row,last_coord.exp_coordinates.column)
+			explorer_object := shared_info.explorer.deep_twin -- update last coord
+			shared_info.explorer.set_prev_coord (explorer_object.exp_coordinates.row,explorer_object.exp_coordinates.column)
 
 			quadrant := 1
-			across grid[last_coord.exp_coordinates.row, last_coord.exp_coordinates.column].contents is entity
+			across grid[explorer_object.exp_coordinates.row, explorer_object.exp_coordinates.column].contents is entity
 			loop
 				if entity ~ create{ENTITY_ALPHABET}.make('E') then
 					shared_info.explorer.set_prev_quadrant (quadrant)
@@ -1484,7 +1469,7 @@ feature -- query
 					Result.append (movables.get_description)
 				end
 			end
-		shared_info.stationary_list.remove_head(move_planet_list.count )
+		--shared_info.stationary_list.remove_head(move_planet_list.count )
 
 		end
 

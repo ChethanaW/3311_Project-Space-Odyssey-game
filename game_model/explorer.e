@@ -45,9 +45,9 @@ feature {NONE} -- Initialization
 		end
 feature -- model attributes
 
-	is_dead: BOOLEAN
+	is_dead: BOOLEAN -- did the exlorer die?
 
-	has_yellow_dwarf: BOOLEAN
+	has_yellow_dwarf: BOOLEAN -- is there a yellow dwarf int he same sactor?
 
     letter : ENTITY_ALPHABET
 
@@ -58,13 +58,13 @@ feature -- model attributes
 
     prev_quadrant: INTEGER
 
-    fuel : INTEGER
+    fuel : INTEGER  -- explorer's fuel level
 
-    life: INTEGER
+    life: INTEGER -- explorer's life status
 
-    landed : BOOLEAN
+    landed : BOOLEAN -- did the explorer land
 
-    game_over : INTEGER
+    game_over : INTEGER -- did the explorer die and game ended?
 
     ID: INTEGER = 0
 
@@ -134,37 +134,6 @@ feature -- Command
 			do
 				has_planets:= status
 			end
-
---	update_fuel(sect: SECTOR)
---		local
---			blue: ENTITY_ALPHABET
---			yellow: ENTITY_ALPHABET
---			worm: ENTITY_ALPHABET
---		do
---			create blue.make ('*')
---			create yellow.make ('Y')
---			create worm.make ('W')
-
-----			across sect.contents is element loop
-----				fuel := fuel - 1
-----				if element ~ blue then
-----					fuel := 3
-----					print("here!! ")
-----				elseif element ~ yellow then
-----					if fuel = 0 then
-----						fuel := 2
-----					else
-----						fuel := 3
-----					end
-----				elseif element ~ worm then
-----					fuel := fuel
-----				elseif fuel = 0 then
-----					game_over := 1
-----				end
-----			end
-----				print("the fuel is ")print(fuel)print("%N")
-
---		end
 
 		update_fuel(cur_fuel: INTEGER)
 			do

@@ -8,9 +8,9 @@ deferred class
 	STATIONARY
 
 feature -- common features
-	ID: INTEGER
+	ID: INTEGER -- id of the stationary
 
-	star_luminosity: INTEGER
+	star_luminosity: INTEGER  -- luminosity of a star
 
 	row: INTEGER
 
@@ -36,6 +36,11 @@ feature -- commands
 	set_luminosity(lum: INTEGER)
 		do
 			star_luminosity:=lum
+		end
+
+	set_entity(char: CHARACTER)
+		do
+			entity:= char
 		end
 feature -- query
 

@@ -11,19 +11,26 @@ deferred class
 --	make
 
 feature -- common features
-	movable_id: INTEGER  -- ref -> planet_id : INTEGER
+	movable_id: INTEGER
+	-- movable_id : INTEGER
 
 	actions_left_until_reproduction: INTEGER
+	--actions left until reproduce
 
 	is_dead: BOOLEAN
+	-- is the movable dead?
 
-	load: INTEGER -- Only applicable to janitaur
+	load: INTEGER
+	-- Only applicable to janitaur
 
-	max_load: INTEGER -- only applicable to janitaur
+	max_load: INTEGER
+	-- only applicable to janitaur
 
 	death_message: STRING
+	-- if dead what is the dead message?
 
 	attacked: BOOLEAN
+	-- did explorer get attacked?
 
 	r: INTEGER
 
@@ -42,12 +49,15 @@ feature -- common features
     prev_quadrant: INTEGER
 
 	star_val : BOOLEAN
+	-- is there a star in the secotr?
 
 	supports_life : BOOLEAN
+	-- does a planet in the sector support life?
 
 	has_checked_for_life : BOOLEAN
 
 	visited: BOOLEAN
+	-- has the planets in the sector visited?
 
 	attached_check: BOOLEAN
 
@@ -57,20 +67,25 @@ feature -- common features
 	entity_alphabet: ENTITY_ALPHABET
 
 	landed: BOOLEAN
+	-- did the explorer land?
 
 	new_quadrant: INTEGER
 
 	sector_out_info: STRING
 
 	fuel: INTEGER
+	-- fuel of the movables
 
 	max_fuel: INTEGER
 
 	clone_when_quadrant_not_full: BOOLEAN
+	-- check status to clone for reproduction.
 
 	is_reproduced: BOOLEAN
+	-- did the movable reproduce?
 
 	killer_id: INTEGER
+	-- who is the killer movable?
 
 
 feature -- commands

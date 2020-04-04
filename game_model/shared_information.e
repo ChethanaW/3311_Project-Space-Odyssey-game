@@ -16,10 +16,7 @@ create {SHARED_INFORMATION_ACCESS}
 feature{NONE}
 	make
 		do
-			create planet_list.make_empty
-			create planet_entity_list.make_empty
 			create stationary_list.make_empty
-			planet_id := 1
 
 			create explorer.make
 			skip_explorer_coordinates := FALSE
@@ -83,29 +80,25 @@ feature
 	max_capacity: INTEGER = 4
 		 -- max number of objects that can be stored in a location
 
-	planet_list : ARRAY[PLANET]
-
-	planet_entity_list: ARRAY[ENTITY_ALPHABET]
-
-
 	stationary_list: ARRAY[STATIONARY]
+		 -- list of staionary items
 
 	stationary_id: INTEGER
-
-	planet_id : INTEGER
-
+		 -- to assign ids for statoinary items
 
 	explorer: EXPLORER
-
 
 	skip_explorer_coordinates: BOOLEAN
 
 	planet_supports_life: BOOLEAN
+	     -- check if planet about to land support life or not?
 
 	death_message_status: BOOLEAN
+		-- check if something died
 
 	death_message: STRING
-
+		-- save the death maessage accordingly
+		
 	--movables
 	movables_list : ARRAY[MOVABLE]
 
@@ -165,10 +158,6 @@ feature --commands
 			benign_threshold:=threshhold
 		end
 
-	shared_set_planet_id(id : INTEGER)
-		do
-			planet_id := id
-		end
 
 	shared_set_movables_id(id : INTEGER)
 		do
@@ -184,22 +173,6 @@ feature --commands
 
 feature --queries
 
---	get_movable_object(entity: ENTITY_ALPHABET):MOVABLE
-
---		local
---			pointer: INTEGER
---			l_movable: MOVABLE
---		do
---			Result:= l_movable
---			pointer:= 1
---			across movables_list is movable_obj loop
---				if movable_obj.movable_id ~ entity.entity_movable_id then
---					Result := movable_obj
---					pointer:= pointer+1
---				end
---			end
-
---		end
 
 	get_error_messages(error_num: INTEGER): STRING
 		do

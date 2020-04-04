@@ -1,0 +1,80 @@
+  state:0.0, ok
+  Welcome! Try test(3,5,7,15,30)
+->move(SW)
+  state:0.1, error
+  Negative on that request:no mission in progress.
+->abort
+  state:0.2, error
+  Negative on that request:no mission in progress.
+->status
+  state:0.3, error
+  Negative on that request:no mission in progress.
+->play
+  state:1.0, mode:play, ok
+  Movement:none
+    (1:1)  (1:2)  (1:3)  (1:4)  (1:5)  
+    E---   *---   P---   ----   PP--   
+    (2:1)  (2:2)  (2:3)  (2:4)  (2:5)  
+    ----   ----   W---   ----   P---   
+    (3:1)  (3:2)  (3:3)  (3:4)  (3:5)  
+    MY--   ----   O---   PW--   ----   
+    (4:1)  (4:2)  (4:3)  (4:4)  (4:5)  
+    W---   M*--   P---   P*--   ----   
+    (5:1)  (5:2)  (5:3)  (5:4)  (5:5)  
+    BW--   ----   *---   ----   PW--   
+->play
+  state:1.1, mode:play, error
+  To start a new mission, please abort the current one first.
+->move(N)
+  state:2.0, mode:play, ok
+  Movement:
+    [0,E]:[1,1,1]->[5,1,3]
+    [3,P]:[1,5,2]->[5,4,1]
+    [8,P]:[4,3,1]->[3,2,1]
+    (1:1)  (1:2)  (1:3)  (1:4)  (1:5)  
+    ----   *---   P---   ----   P---   
+    (2:1)  (2:2)  (2:3)  (2:4)  (2:5)  
+    ----   ----   W---   ----   P---   
+    (3:1)  (3:2)  (3:3)  (3:4)  (3:5)  
+    MY--   P---   O---   PW--   ----   
+    (4:1)  (4:2)  (4:3)  (4:4)  (4:5)  
+    W---   M*--   ----   P*--   ----   
+    (5:1)  (5:2)  (5:3)  (5:4)  (5:5)  
+    BWE-   ----   *---   P---   PW--   
+->status
+  state:2.1, mode:play, ok
+  Explorer status report:Travelling at cruise speed at [5,1,3]
+  Life units left:3, Fuel units left:2
+->land
+  state:2.2, mode:play, error
+  Negative on that request:no yellow dwarf at Sector:5:1
+->liftoff
+  state:2.3, mode:play, error
+  Negative on that request:you are not on a planet at Sector:5:1
+->abort
+  state:2.4, ok
+  Mission aborted. Try test(3,5,7,15,30)
+->status
+  state:2.5, error
+  Negative on that request:no mission in progress.
+->test(3,8,4,35,60)
+  state:2.6, error
+  Thresholds should be non-decreasing order.
+->move(W)
+  state:2.7, error
+  Negative on that request:no mission in progress.
+->status
+  state:2.8, error
+  Negative on that request:no mission in progress.
+->move(S)
+  state:2.9, error
+  Negative on that request:no mission in progress.
+->land
+  state:2.10, error
+  Negative on that request:no mission in progress.
+->liftoff
+  state:2.11, error
+  Negative on that request:no mission in progress.
+->abort
+  state:2.12, error
+  Negative on that request:no mission in progress.
