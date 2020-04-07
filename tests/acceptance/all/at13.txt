@@ -1,0 +1,11 @@
+--Test for test command with not non-decreasing thresholds and test for explorer getting destroyed by an asteroid
+test(50,30,20,90,100)
+test(30,50,70,90,100)
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass

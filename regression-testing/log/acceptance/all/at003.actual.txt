@@ -236,8 +236,8 @@
     [16,P]:[1,3,1]->[5,2,3]
     [19,P]:[3,1,1]->[4,2,2]
     [20,B]:[3,1,2]->[2,1,4]
-      destroyed [12,M] at [2,1,1]
       destroyed [11,M] at [2,1,3]
+      destroyed [12,M] at [2,1,1]
     [22,J]:[3,2,1]->[4,1,1]
     [24,M]:[2,3,3]->[2,2,1]
       reproduced [50,M] at [2,2,3]
@@ -333,9 +333,9 @@
     [49,P]->attached?:F, support_life?:F, visited?:F, turns_left:0
     [50,M]->fuel:3/3, actions_left_until_reproduction:1/1, turns_left:1
   Deaths This Turn:
-    [12,M]->fuel:3/3, actions_left_until_reproduction:0/1, turns_left:N/A,
-      Malevolent got destroyed by benign (id: 20) at Sector:2:1
     [11,M]->fuel:3/3, actions_left_until_reproduction:0/1, turns_left:N/A,
+      Malevolent got destroyed by benign (id: 20) at Sector:2:1
+    [12,M]->fuel:3/3, actions_left_until_reproduction:0/1, turns_left:N/A,
       Malevolent got destroyed by benign (id: 20) at Sector:2:1
     [26,A]->turns_left:N/A,
       Asteroid got devoured by blackhole (id: -1) at Sector:3:3

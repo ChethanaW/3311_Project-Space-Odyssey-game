@@ -1,3 +1,4 @@
+--tested for different test thresholds and moving explorer outside the grid
 test(5,3,7,15,30)
 play
 abort
@@ -8,8 +9,27 @@ play
 test(3,5,7,15,30)
 abort
 test(3,5,7,15,30)
+move(S)
+move(E)
+land
+liftoff
+pass
+abort
 test(1,4,8,13,40)
+move(NW)
+move(S)
+wormhole
+land
+liftoff
+pass
+abort
 play
+abort
 test(6,9,18,29,51)
+move(S)
+move(W)
+land
+liftoff
+pass
 play
 abort

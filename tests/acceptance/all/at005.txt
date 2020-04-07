@@ -1,4 +1,4 @@
---play
+-- test land for scenarios where there is no planet and no yellow dwarf separately
 test(3,5,7,15,30)
 move(E)
 move(E)

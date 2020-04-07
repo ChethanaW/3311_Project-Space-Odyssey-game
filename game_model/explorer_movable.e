@@ -27,6 +27,7 @@ feature {NONE} -- Initialization
 			create death_message.make_empty
 			is_dead := FALSE
 			attacked:= FALSE
+			
 		end
 
 feature -- Access

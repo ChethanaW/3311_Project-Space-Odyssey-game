@@ -88,7 +88,7 @@ feature -- common features
 	-- who is the killer movable?
 
 
-feature -- commands
+feature {GALAXY, SHARED_INFORMATION, SECTOR}-- commands
 
 	set_is_reproduced(value: BOOLEAN)
 		do
@@ -347,7 +347,5 @@ feature --queries
 			set_death_message(Result)
 		end
 
-invariant
-	invariant_clause: True -- Your invariant here
 
 end

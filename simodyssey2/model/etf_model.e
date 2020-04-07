@@ -27,8 +27,8 @@ feature {NONE} -- Initialization
 			j := 0
          	play_check:=0
          	abort_flag := 0
-         	land_flag := 0   -----------######### may be we can put it in explorer...ikr lets seee
-         	blackhole_output := 0  --------########## may be this tooo better if we can move it to explorer
+         	land_flag := 0
+         	blackhole_output := 0
          	trying_to_land := 0
 
          	--boolean
@@ -47,8 +47,6 @@ feature {NONE} -- Initialization
 			create error_message.make_empty
 
 			--other
-         --	create explorer.make
-         	--create planet.make
          	create g.dummy_galaxy_make
          	info := sa.shared_info
          	info.set_death_message_status(FALSE)
@@ -70,7 +68,7 @@ feature -- model attributes
 	fuel_check_game_over: BOOLEAN
 	movement_out: BOOLEAN
 	entity_movement: BOOLEAN
-    exp_move_status: BOOLEAN ----------------------##########not initialized --may be there is a better way to use it
+    exp_move_status: BOOLEAN
     passing: BOOLEAN
     error: BOOLEAN
 
@@ -83,8 +81,7 @@ feature -- model attributes
     --other
 	g : GALAXY -- has access to shared information
  	info : SHARED_INFORMATION
-	-- explorer : EXPLORER
-    --planet: PLANET
+
 
 
 
@@ -114,7 +111,6 @@ feature -- model operations
 			info.movables_entity_list.make_empty
 			info.movables_list.make_empty
 			info.stationary_list.make_empty
-			-- info.movables_entity_list.count
 
 			info.explorer.set_is_dead(false)
 			fuel_check_game_over := false
@@ -156,22 +152,14 @@ feature -- model operations
 				error:= TRUE
 				error_message:= info.get_error_messages(5)
 			else
-				-- things to do if land is used at a valid time
-				-- trying_to_land := 1
-				--if g.landed_planet = true then
 				g.visit_planet
 				if info.planet_supports_life then
 					land_flag := 1
 
 
 				end
-
-
-				--end
-
-			--	g.ex.update_landed_status(TRUE)
 				info.set_skip_explorer_coordinates(TRUE)
-				info.explorer.update_landed_status (TRUE)  -------###### double check if this is correct the case if no life we still land or not
+				info.explorer.update_landed_status (TRUE) 
 				g.move_movables
 
 			end
@@ -204,8 +192,7 @@ feature -- model operations
 					cmd_name:="wormhole" -- display purposes
 					error_message:=info.get_error_messages(6)
 				end
-				--entity_movement:= TRUE -- bcs planets and others move without the explorer
-				--g.move_planets
+
 			end
 
 			update_status
@@ -236,13 +223,9 @@ feature -- model operations
 					error_message:= info.get_error_messages (8)
 				elseif info.explorer.is_dead then
 					fuel_check_game_over := true -- for display purposes... need to see the grid and error message
-					-- error:=TRUE
-					-- error_message:= info.get_error_messages (12)
 				end
-				--g.move_planets
 				g.move_movables
 	 			board_print := g.out
-	 			-- print(explorer.fuel)
 	 			if info.explorer.fuel < 1 then -- out of fuel
 	 				fuel_check_game_over := true
 	 			end
@@ -290,13 +273,11 @@ feature -- model operations
 
 
 			if mode ~"abort" or mode ~ "start" then
-				--play_check:= play_check + 1
 				mode:= "play"
 				info.explorer.update_fuel(3)
 				info.explorer.update_life(3)
 				info.explorer.update_coord (1, 1)
 				info.explorer.set_quadrant (1) -- verify
-				--g := new_galaxy(3,5,7,15,30)
 				info.test(3,5,7,15,30)
          		create g.make
 
@@ -328,11 +309,9 @@ feature -- model operations
 				error_message:= info.get_error_messages (1)
 
 			else
-				-- things to do if status is used at a valid time
-
-
+				-- nothing is done
 			end
-			--print("here2")
+
 
 		end
 
@@ -346,34 +325,27 @@ feature -- model operations
 			entity_movement:= FALSE -- nothing moves
 
 			if not (0 < a_threshold and a_threshold <= j_threshold and j_threshold <= m_threshold and m_threshold <= b_threshold and b_threshold <= p_threshold and p_threshold <= 101)then
-					--print("error hereeeee")
 					error_message:= info.get_error_messages (10)
 					error:= TRUE
 			else
 
-			play_check:= play_check + 1
+				play_check:= play_check + 1
 
 
-			if mode ~ "abort" or mode ~ "start" then
+				if mode ~ "abort" or mode ~ "start" then
 
-				mode:= "test"
-				info.explorer.update_fuel(3)
-				info.explorer.update_life(3)
-				info.explorer.update_coord (1, 1)
-				info.explorer.set_quadrant (1) -- verify
-				g := new_galaxy(a_threshold,j_threshold,m_threshold,b_threshold,p_threshold)
-				board_print := g.out
-			else
-
---				if not (0 < a_threshold and a_threshold <= j_threshold and j_threshold <= m_threshold and m_threshold <= b_threshold and b_threshold <= p_threshold and p_threshold <= 101)then
---					print("error hereeeee")
---					error_message:= info.get_error_messages (10)
---				else
+					mode:= "test"
+					info.explorer.update_fuel(3)
+					info.explorer.update_life(3)
+					info.explorer.update_coord (1, 1)
+					info.explorer.set_quadrant (1) -- verify
+					g := new_galaxy(a_threshold,j_threshold,m_threshold,b_threshold,p_threshold)
+					board_print := g.out
+				else
 					error_message:= info.get_error_messages (9)
-				--end
-				error:= TRUE
+					error:= TRUE
 
-			end
+				end
 			end
 
 			update_status
@@ -398,19 +370,15 @@ feature -- model operations
 				error_message:= info.get_error_messages(7)
 			else
 				exp_move_status:= g.check_for_wormhole
-				--g.wormhole_move(entity)
 				if exp_move_status ~ FALSE then
 					error:=TRUE
 					error_message:= info.get_error_messages(11)
 				else
-
-				-- things to do if wormhole is used at a valid time
-				--if wormhole present
 					cmd_name := "move" -- due to similar functionality same """update_status"""
-				--  explore randomly moves
-				g.wormhole_move
-				--  planet moves just as if move command was entered
-				g.move_movables
+					--  explore randomly moves
+					g.wormhole_move
+					--  planet moves just as if move command was entered
+					g.move_movables
 				end
 
 
@@ -446,10 +414,6 @@ feature -- model operations
 					j:= j+1
 				end
 			end
---			print("mode name i j")
---			print("%N")
---			print(mode)print("  ") print(cmd_name)print("  ") print(i) print("  ")print(j)
---			print("%N")
 		end
 
 
@@ -463,11 +427,6 @@ feature -- queries
 			Result.append (".")
 			Result.append (j.out)
 
-			--------------remove later **************************
---			Result.append("has fuel")
---			Result.append_integer_64(info.explorer.fuel)
-
-			------------------------
 
 			if cmd_name ~ "none" then
 				Result.append (", ok")
@@ -504,31 +463,12 @@ feature -- queries
 					Result.append ("%N")
 					Result.append ("  ")
 
---					if fuel_check_game_over then
---						if info.explorer.is_dead then
---							Result.append("Explorer got devoured by blackhole (id: -1) at Sector:3:3")
---						else
---						Result.append("Explorer got lost in space - out of fuel at Sector:")
---						Result.append_integer_64(info.explorer.exp_coordinates.row)
---						Result.append(":")
---						Result.append_integer_64(info.explorer.exp_coordinates.column)
---						Result.append("%N")
---						Result.append("  The game has ended. You can start a new game.")
---						end
---						Result.append("%N  ")
-
---					end
-
-
 					if info.explorer.is_dead then
 						Result.append(info.explorer.death_message)
 						Result.append("%N")
 						Result.append("  The game has ended. You can start a new game.")
 						Result.append("%N  ")
 					end
-
-
-
 
 					if cmd_name ~ "abort" or cmd_name ~ "status" then
 						if cmd_name ~ "abort" then
@@ -557,7 +497,6 @@ feature -- queries
 								Result.append(",")
 								Result.append_integer_64(info.explorer.quadrant)
 								Result.append("]")
-							--	Result.append ("Life units left:" + V + Result.append(", Fuel units left:") + W
 								Result.append("%N")
 								Result.append("  Life units left:")
 								Result.append_integer_64(info.explorer.life)
@@ -572,7 +511,6 @@ feature -- queries
 							Result.append_integer_64(info.explorer.exp_coordinates.row)
 							Result.append(":")
 							Result.append_integer_64(info.explorer.exp_coordinates.column)
-							-- add the X:Y
 							Result.append ("%N")
 							Result.append ("  ")
 
@@ -612,7 +550,6 @@ feature -- queries
 								Result.append (g.description_out)
 								Result.append ("%N")
 								Result.append ("  Deaths This Turn:")
-								--Result.append (info.explorer.death_message)
 								if info.death_message_status then
 									Result.append(g.deaths_out)
 								else
@@ -634,11 +571,7 @@ feature -- queries
 								mode:= "abort"
 								error:= TRUE
 							end
-
 						end
-
-
-
 					end
 				end -- if for error check
 			end -- if for start check

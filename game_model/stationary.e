@@ -16,7 +16,7 @@ feature -- common features
 
 	column: INTEGER
 	entity:CHARACTER
-feature -- commands
+feature {SHARED_INFORMATION, GALAXY}-- commands
 
 	set_id(stationary_id: INTEGER)
 		do
@@ -42,14 +42,5 @@ feature -- commands
 		do
 			entity:= char
 		end
-feature -- query
-
-
-
-
-feature {NONE} -- Implementation
-
-invariant
-	invariant_clause: True -- Your invariant here
 
 end

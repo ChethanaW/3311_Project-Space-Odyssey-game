@@ -1,3 +1,4 @@
+--Testing for explorer getting devoured by blackhole and game ends.
 test(3,5,7,15,30)
 move(S)
 move(E)

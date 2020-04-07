@@ -1,3 +1,4 @@
+--Test wormhole command on explorer when there is a wormhole in the same sector as the explorer
 play
 pass
 pass
@@ -17,3 +18,7 @@ pass
 pass
 pass
 pass
+move(S)
+move(S)
+move(S)
+wormhole

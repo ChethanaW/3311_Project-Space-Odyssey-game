@@ -1,3 +1,4 @@
+-- test a scenario where explorer land successfully
 --play
 --toggle_RNG_out
 test(3,5,7,15,30)

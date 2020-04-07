@@ -1,3 +1,4 @@
+--wormhole sends a movable to a sector
 test(3,5,7,15,30)
 move(NE)
 pass
